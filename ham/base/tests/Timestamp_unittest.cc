@@ -1,8 +1,8 @@
-#include <muduo/base/Timestamp.h>
+#include "../Timestamp.h"
 #include <vector>
 #include <stdio.h>
 
-using muduo::Timestamp;
+using namespace ham;
 
 void passByConstReference(const Timestamp& x)
 {

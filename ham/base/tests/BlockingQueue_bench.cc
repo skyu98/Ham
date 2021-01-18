@@ -1,10 +1,11 @@
-#include <muduo/base/BlockingQueue.h>
-#include <muduo/base/CountDownLatch.h>
-#include <muduo/base/Thread.h>
-#include <muduo/base/Timestamp.h>
+#include "../BlockingQueue.h"
+#include "../CountDownLatch.h"
+#include "../CurrentThread.h"
+#include "../Timestamp.h"
 
-#include <boost/bind.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <thread>
+#include <functional>
+#include <vector>
 #include <map>
 #include <string>
 #include <stdio.h>
@@ -13,17 +14,12 @@ class Bench
 {
  public:
   Bench(int numThreads)
-    : latch_(numThreads),
-      threads_(numThreads)
+    : latch_(numThreads)
   {
     for (int i = 0; i < numThreads; ++i)
     {
-      char name[32];
-      snprintf(name, sizeof name, "work thread %d", i);
-      threads_.push_back(new muduo::Thread(
-            boost::bind(&Bench::threadFunc, this), muduo::string(name)));
+      threads_.emplace_back(std::thread(std::mem_fn(&Bench::threadFunc)));
     }
-    for_each(threads_.begin(), threads_.end(), boost::bind(&muduo::Thread::start, _1));
   }
 
   void run(int times)
@@ -33,7 +29,7 @@ class Bench
     printf("all threads started\n");
     for (int i = 0; i < times; ++i)
     {
-      muduo::Timestamp now(muduo::Timestamp::now());
+      ham::Timestamp now(ham::Timestamp::now());
       queue_.put(now);
       usleep(1000);
     }
@@ -43,10 +39,13 @@ class Bench
   {
     for (size_t i = 0; i < threads_.size(); ++i)
     {
-      queue_.put(muduo::Timestamp::invalid());
+      queue_.put(ham::Timestamp::invalid());
     }
 
-    for_each(threads_.begin(), threads_.end(), boost::bind(&muduo::Thread::join, _1));
+    for(auto it = threads_.begin();it != threads_.end();++it)
+    {
+      it->join();
+    }
   }
 
  private:
@@ -54,41 +53,41 @@ class Bench
   void threadFunc()
   {
     printf("tid=%d, %s started\n",
-           muduo::CurrentThread::tid(),
-           muduo::CurrentThread::name());
+           ham::CurrentThread::tid(),
+           ham::CurrentThread::name());
 
     std::map<int, int> delays;
     latch_.countDown();
     bool running = true;
     while (running)
     {
-      muduo::Timestamp t(queue_.take());
-      muduo::Timestamp now(muduo::Timestamp::now());
+      ham::Timestamp t(queue_.take());
+      ham::Timestamp now(ham::Timestamp::now());
       if (t.valid())
       {
         int delay = static_cast<int>(timeDifference(now, t) * 1000000);
         // printf("tid=%d, latency = %d us\n",
-        //        muduo::CurrentThread::tid(), delay);
+        //        ham::CurrentThread::tid(), delay);
         ++delays[delay];
       }
       running = t.valid();
     }
 
     printf("tid=%d, %s stopped\n",
-           muduo::CurrentThread::tid(),
-           muduo::CurrentThread::name());
+           ham::CurrentThread::tid(),
+           ham::CurrentThread::name());
     for (std::map<int, int>::iterator it = delays.begin();
         it != delays.end(); ++it)
     {
       printf("tid = %d, delay = %d, count = %d\n",
-             muduo::CurrentThread::tid(),
+             ham::CurrentThread::tid(),
              it->first, it->second);
     }
   }
 
-  muduo::BlockingQueue<muduo::Timestamp> queue_;
-  muduo::CountDownLatch latch_;
-  boost::ptr_vector<muduo::Thread> threads_;
+  ham::BlockingQueue<ham::Timestamp> queue_;
+  ham::CountDownLatch latch_;
+  std::vector<std::thread> threads_;
 };
 
 int main(int argc, char* argv[])

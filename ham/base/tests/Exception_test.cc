@@ -1,4 +1,4 @@
-#include <muduo/base/Exception.h>
+#include "../Exception.h"
 #include <stdio.h>
 
 class Bar
@@ -6,7 +6,7 @@ class Bar
  public:
   void test()
   {
-    throw muduo::Exception("oops");
+    throw ham::Exception("oops");
   }
 };
 
@@ -22,7 +22,7 @@ int main()
   {
     foo();
   }
-  catch (const muduo::Exception& ex)
+  catch (const ham::Exception& ex)
   {
     printf("reason: %s\n", ex.what());
     printf("stack trace: %s\n", ex.stackTrace());

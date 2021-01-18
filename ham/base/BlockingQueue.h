@@ -35,7 +35,7 @@ class BlockingQueue : boost::noncopyable       // 无边界
     // always use a while-loop, due to spurious wakeup。防止一次唤醒多个线程取数据
     while (queue_.empty())
     {
-      notEmpty_.wait();
+      notEmpty_.wait(lock);
     }
     assert(!queue_.empty());
     T front(queue_.front());

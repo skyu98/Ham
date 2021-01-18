@@ -1,5 +1,7 @@
 #ifndef HAM_BASE_CURRENTTHREAD_H
 #define HAM_BASE_CURRENTTHREAD_H
+#include <pthread.h>
+#include <unistd.h>
 
 namespace ham
 {

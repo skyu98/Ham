@@ -1,7 +1,8 @@
-#include <muduo/base/Singleton.h>
-#include <muduo/base/CurrentThread.h>
-#include <muduo/base/Thread.h>
+#include "../Singleton.h"
+#include "../CurrentThread.h"
 
+#include <thread>
+#include <string>
 #include <boost/noncopyable.hpp>
 #include <stdio.h>
 
@@ -10,38 +11,37 @@ class Test : boost::noncopyable
  public:
   Test()
   {
-    printf("tid=%d, constructing %p\n", muduo::CurrentThread::tid(), this);
+    printf("tid=%d, constructing %p\n", ham::CurrentThread::tid(), this);
   }
 
   ~Test()
   {
-    printf("tid=%d, destructing %p %s\n", muduo::CurrentThread::tid(), this, name_.c_str());
+    printf("tid=%d, destructing %p %s\n", ham::CurrentThread::tid(), this, name_.c_str());
   }
 
-  const muduo::string& name() const { return name_; }
-  void setName(const muduo::string& n) { name_ = n; }
+  const std::string& name() const { return name_; }
+  void setName(const std::string& n) { name_ = n; }
 
  private:
-  muduo::string name_;
+  std::string name_;
 };
 
 void threadFunc()
 {
   printf("tid=%d, %p name=%s\n",
-         muduo::CurrentThread::tid(),
-         &muduo::Singleton<Test>::instance(),
-         muduo::Singleton<Test>::instance().name().c_str());
-  muduo::Singleton<Test>::instance().setName("only one, changed");
+         ham::CurrentThread::tid(),
+         &ham::Singleton<Test>::instance(),
+         ham::Singleton<Test>::instance().name().c_str());
+  ham::Singleton<Test>::instance().setName("only one, changed");
 }
 
 int main()
 {
-  muduo::Singleton<Test>::instance().setName("only one");
-  muduo::Thread t1(threadFunc);
-  t1.start();
+  ham::Singleton<Test>::instance().setName("only one");
+  std::thread t1(threadFunc);
   t1.join();
   printf("tid=%d, %p name=%s\n",
-         muduo::CurrentThread::tid(),
-         &muduo::Singleton<Test>::instance(),
-         muduo::Singleton<Test>::instance().name().c_str());
+         ham::CurrentThread::tid(),
+         &ham::Singleton<Test>::instance(),
+         ham::Singleton<Test>::instance().name().c_str());
 }

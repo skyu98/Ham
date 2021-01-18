@@ -2,7 +2,7 @@
 #include "../base/Exception.h"
 
 #include <type_traits>
-
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -21,7 +21,7 @@ namespace CurrentThread
   __thread char t_tidString[32];	// 这是tid的字符串表示形式
   __thread const char* t_threadName = "unknown";
   const bool sameType = std::is_same<int, pid_t>::value;   // 内部完全一样，类名不一样，也不是same
-  static_assert(sameType);
+  static_assert(sameType == true, "pid_t is not int here!!!");
 }
 
 namespace detail

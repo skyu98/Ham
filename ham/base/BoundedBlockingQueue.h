@@ -7,7 +7,7 @@
 #include <boost/noncopyable.hpp>
 #include <assert.h>
 
-namespace muduo
+namespace ham
 {
 
 template<typename T>

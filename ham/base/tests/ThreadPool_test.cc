@@ -1,23 +1,23 @@
-#include <muduo/base/ThreadPool.h>
-#include <muduo/base/CountDownLatch.h>
-#include <muduo/base/CurrentThread.h>
+#include "../ThreadPool.h"
+#include "../CountDownLatch.h"
+#include "../CurrentThread.h"
 
 #include <boost/bind.hpp>
 #include <stdio.h>
 
 void print()
 {
-  printf("tid=%d\n", muduo::CurrentThread::tid());
+  printf("tid=%d\n", ham::CurrentThread::tid());
 }
 
 void printString(const std::string& str)
 {
-  printf("tid=%d, str=%s\n", muduo::CurrentThread::tid(), str.c_str());
+  printf("tid=%d, str=%s\n", ham::CurrentThread::tid(), str.c_str());
 }
 
 int main()
 {
-  muduo::ThreadPool pool("MainThreadPool");
+  ham::ThreadPool pool("MainThreadPool");
   pool.start(5);
 
   pool.run(print);
@@ -29,8 +29,8 @@ int main()
     pool.run(boost::bind(printString, std::string(buf)));
   }
 
-  muduo::CountDownLatch latch(1);
-  pool.run(boost::bind(&muduo::CountDownLatch::countDown, &latch));
+  ham::CountDownLatch latch(1);
+  pool.run(boost::bind(&ham::CountDownLatch::countDown, &latch));
   latch.wait();
   pool.stop();
 }
