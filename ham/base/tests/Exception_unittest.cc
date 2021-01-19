@@ -29,7 +29,7 @@ int main()
     {
         std::cout << "Catch Ex!!!"<< '\n';
         std::cout << "reasons: " << std::string(ex.what()) << std::endl;
-        std::cout << "stack trace: " << std::string(ex.stackTrace()) << std::endl;
+        std::cout << "stack trace: \n" << std::string(ex.stackTrace()) << std::endl;
     }
     return 0;
 }

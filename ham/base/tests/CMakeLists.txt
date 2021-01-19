@@ -3,3 +3,6 @@ target_link_libraries(Timestamp_unittest ham_base)
 
 add_executable(Exception_unittest Exception_unittest.cc)
 target_link_libraries(Exception_unittest ham_base)
+
+add_executable(CountDownLatch_unittest CountDownLatch_unittest.cc)
+target_link_libraries(CountDownLatch_unittest ham_base)

@@ -28,7 +28,7 @@ void benchmark()
     printf("end at %s\n", stamps.back().toString().c_str());
     printf("time difference is %f\n", timeDifference(stamps.back(), stamps.front()));
 
-    std::vector<int64_t> gaps(100);
+    std::vector<int> gaps(100, 0);  //TODO : why using int64_t leads to error?
     int64_t cur = stamps.front().microsecondsFromEpoch(), next; 
     for(int i = 1;i < kNumber;++i)
     {
@@ -40,19 +40,19 @@ void benchmark()
         {
             printf("reverse!!!\n");
         }
-        else if(gap <= 100)
+        else if(gap < 100)
         {
-            ++gaps[gap - 1];
+            ++gaps[gap];
         }
         else
         {
-            printf("Big gap!!!\n");
+            printf("Big gap: %ld!!!\n", gap);
         }
     }
 
     for(int i = 0;i < 100;++i)
     {
-        printf("%d, %lld\n", i, gaps[i]);
+        printf("%d, %d\n", i, gaps[i]);
     }
 }
 
