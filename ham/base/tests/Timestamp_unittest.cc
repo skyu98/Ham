@@ -1,66 +1,67 @@
 #include "../Timestamp.h"
 #include <vector>
-#include <stdio.h>
+#include <string>
 
 using namespace ham;
 
-void passByConstReference(const Timestamp& x)
+void passByRef(const Timestamp& T)
 {
-  printf("%s\n", x.toString().c_str());
+    printf("%s\n", T.toString().c_str());
 }
 
-void passByValue(Timestamp x)
+void passByVal(Timestamp T)
 {
-  printf("%s\n", x.toString().c_str());
+    printf("%s\n", T.toString().c_str());
 }
 
 void benchmark()
 {
-  const int kNumber = 1000*1000;
+    const int kNumber = 1000 * 1000;
+    std::vector<Timestamp> stamps;
+    stamps.reserve(kNumber);
 
-  std::vector<Timestamp> stamps;
-  stamps.reserve(kNumber);
-  for (int i = 0; i < kNumber; ++i)
-  {
-    stamps.push_back(Timestamp::now());
-  }
-  printf("%s\n", stamps.front().toString().c_str());
-  printf("%s\n", stamps.back().toString().c_str());
-  printf("%f\n", timeDifference(stamps.back(), stamps.front()));
+    for(int i = 0;i < kNumber;++i)
+    {
+        stamps.emplace_back(Timestamp::now());
+    }
+    printf("begin at %s\n", stamps.front().toString().c_str());
+    printf("end at %s\n", stamps.back().toString().c_str());
+    printf("time difference is %f\n", timeDifference(stamps.back(), stamps.front()));
 
-  int increments[100] = { 0 };
-  int64_t start = stamps.front().microSecondsSinceEpoch();
-  for (int i = 1; i < kNumber; ++i)
-  {
-    int64_t next = stamps[i].microSecondsSinceEpoch();
-    int64_t inc = next - start;
-    start = next;
-    if (inc < 0)
+    std::vector<int64_t> gaps(100);
+    int64_t cur = stamps.front().microsecondsFromEpoch(), next; 
+    for(int i = 1;i < kNumber;++i)
     {
-      printf("reverse!\n");
-    }
-    else if (inc < 100)
-    {
-      ++increments[inc];
-    }
-    else
-    {
-      printf("big gap %d\n", static_cast<int>(inc));
-    }
-  }
+        next = stamps[i].microsecondsFromEpoch();
+        int64_t gap = next - cur;
+        cur = next;
 
-  for (int i = 0; i < 100; ++i)
-  {
-    printf("%2d: %d\n", i, increments[i]);
-  }
+        if(gap < 0)
+        {
+            printf("reverse!!!\n");
+        }
+        else if(gap <= 100)
+        {
+            ++gaps[gap - 1];
+        }
+        else
+        {
+            printf("Big gap!!!\n");
+        }
+    }
+
+    for(int i = 0;i < 100;++i)
+    {
+        printf("%d, %lld\n", i, gaps[i]);
+    }
 }
 
 int main()
 {
-  Timestamp now(Timestamp::now());
-  printf("%s\n", now.toString().c_str());
-  passByValue(now);
-  passByConstReference(now);
-  benchmark();
+    Timestamp now = Timestamp::now();
+    printf("now is %s\n", now.toString().c_str());
+    passByRef(now);
+    passByVal(now);
+    benchmark();
+    return 0;
 }
-

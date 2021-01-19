@@ -1,99 +1,70 @@
-#ifndef HAM_BASE_TIMESTAMP_H
-#define HAM_BASE_TIMESTAMP_H
+#ifndef __TIMESTAMP_H__
+#define __TIMESTAMP_H__
 
-#include "../base/copyable.h"
-#include "../base/Types.h"
-
+#include "copyable.h"
+#include "Types.h"
+#include <string>
+#include <chrono>
 #include <boost/operators.hpp>
 
 namespace ham
 {
 
-///
-/// Time stamp in UTC, in microseconds resolution.
-///
-/// It's recommended to pass it by value, since it's passed in register on x64.
-///
-class Timestamp : public ham::copyable,    // 空基类；用于标识该类为可拷贝类型
-                  public boost::less_than_comparable<Timestamp>     // 只需要实现<，自动实现>,>=,<=
+class Timestamp:  public ham::copyable,
+                  public boost::less_than_comparable<Timestamp>
 {
- public:
-  ///
-  /// Constucts an invalid Timestamp.
-  ///
-  Timestamp(): microSecondsSinceEpoch_(0)
-  {
-  }
+public:
+    Timestamp(int64_t microsecondsFromEpoch = 0)
+            : microsecondsFromEpoch_(microsecondsFromEpoch)
+    {}
+    
+    ~Timestamp(){};
 
-  ///
-  /// Constucts a Timestamp at specific time
-  ///
-  /// @param microSecondsSinceEpoch
-  explicit Timestamp(int64_t microSecondsSinceEpoch);
+    // defalut assignment & copy ctr is ok
+    
+    std::string toString() const;
 
-  // 交换两个时间戳：通过pass by reference交换两者的数据成员
-  void swap(Timestamp& that)
-  {
-    std::swap(microSecondsSinceEpoch_, that.microSecondsSinceEpoch_);
-  }
+    Timestamp& swap(Timestamp& src);
+    
+    bool valid() const { return microsecondsFromEpoch_ > 0; }
 
-  // default copy/assignment/dtor are Okay    （不涉及动态内存智能指针等，合成拷贝控制成员可以满足要求）
+    int64_t microsecondsFromEpoch() const { return microsecondsFromEpoch_; }
+    int64_t secondsFromEpoch() const { return microsecondsFromEpoch_; }
+    
+    // 以下函数与this指针无关，所以是静态成员函数
+    static Timestamp now(); 
+    static Timestamp invalid();
 
-  string toString() const;
-  string toFormattedString() const;
+    static const int kMicrosecondsPerSencond = 1000 * 1000;
 
-  bool valid() const { return microSecondsSinceEpoch_ > 0; }
-
-  // for internal usage.
-  int64_t microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
-  time_t secondsSinceEpoch() const
-  { return static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); }
-
-  ///
-  /// Get time of now.
-  ///
-  static Timestamp now();
-  static Timestamp invalid();
-
-  static const int kMicroSecondsPerSecond = 1000 * 1000;
-
- private:
-  int64_t microSecondsSinceEpoch_;     // 距离1970-01-01 00:00:00
+private:
+    int64_t microsecondsFromEpoch_;
 };
 
-inline bool operator<(Timestamp lhs, Timestamp rhs)
+inline bool operator<(Timestamp lhs, Timestamp rhs)  // int64传值比传地址快
 {
-  return lhs.microSecondsSinceEpoch() < rhs.microSecondsSinceEpoch();
+    return lhs.microsecondsFromEpoch() < rhs.microsecondsFromEpoch();
 }
 
-inline bool operator==(Timestamp lhs, Timestamp rhs)
+inline bool operator==(Timestamp lhs, Timestamp rhs)  
 {
-  return lhs.microSecondsSinceEpoch() == rhs.microSecondsSinceEpoch();
+    return lhs.microsecondsFromEpoch() == rhs.microsecondsFromEpoch();
 }
 
-///
-/// Gets time difference of two timestamps, result in seconds.
-///
-/// @param high, low
-/// @return (high-low) in seconds
-/// @c double has 52-bit precision, enough for one-microseciond
-/// resolution for next 100 years.
-inline double timeDifference(Timestamp high, Timestamp low)
+inline double timeDifference(Timestamp lhs, Timestamp rhs)
 {
-  int64_t diff = high.microSecondsSinceEpoch() - low.microSecondsSinceEpoch();
-  return static_cast<double>(diff) / Timestamp::kMicroSecondsPerSecond;    // 结果/（1000*1000），返回的是秒数
+    int64_t diff = lhs.microsecondsFromEpoch() - rhs.microsecondsFromEpoch();
+    diff /= Timestamp::kMicrosecondsPerSencond;
+    return static_cast<double>(diff);
 }
 
-///
-/// Add @c seconds to given timestamp.
-///
-/// @return timestamp+seconds as Timestamp
-///
-inline Timestamp addTime(Timestamp timestamp, double seconds)
+inline Timestamp addTime(Timestamp src, double secondsToBeAdded)
 {
-  int64_t delta = static_cast<int64_t>(seconds * Timestamp::kMicroSecondsPerSecond);
-  return Timestamp(timestamp.microSecondsSinceEpoch() + delta);
+    int64_t microseconds = static_cast<int64_t>(secondsToBeAdded * 
+                                                Timestamp::kMicrosecondsPerSencond);
+    return Timestamp(microseconds);
 }
 
 }
-#endif  // HAM_BASE_TIMESTAMP_H
+
+#endif // __TIMESTAMP_H__

@@ -1,13 +1,15 @@
-#ifndef BURGER_BASE_COPYABLE_H
-#define BURGER_BASE_COPYABLE_H
+#ifndef __COPYABLE_H__
+#define __COPYABLE_H__
 
 namespace ham
 {
 
-/* 空基类，标识该类的派生类都是value类型的 */
-class copyable
-{};
+/* 用于表示；一般为值类型对象 */
+class copyable  
+{
+
+};
 
 }
 
-#endif
+#endif // __COPYABLE_H__

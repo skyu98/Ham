@@ -1,18 +1,5 @@
-add_executable(blockingqueue_test BlockingQueue_test.cc)
-target_link_libraries(blockingqueue_test ham_base)
+add_executable(Timestamp_unittest Timestamp_unittest.cc)
+target_link_libraries(Timestamp_unittest ham_base)
 
-add_executable(blockingqueue_bench BlockingQueue_bench.cc)
-target_link_libraries(blockingqueue_bench ham_base)
-
-add_executable(boundedblockingqueue_test BoundedBlockingQueue_test.cc)
-target_link_libraries(boundedblockingqueue_test ham_base)
-
-add_executable(threadpool_test ThreadPool_test.cc)
-target_link_libraries(threadpool_test ham_base)
-
-add_executable(singleton_test Singleton_test.cc)
-target_link_libraries(singleton_test ham_base)
-
-add_executable(timestamp_unittest Timestamp_unittest.cc)
-target_link_libraries(timestamp_unittest ham_base)
-
+add_executable(Exception_unittest Exception_unittest.cc)
+target_link_libraries(Exception_unittest ham_base)

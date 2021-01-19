@@ -1,29 +1,30 @@
-#ifndef HAM_BASE_EXCEPTION_H
-#define HAM_BASE_EXCEPTION_H
-
-#include "../base/Types.h"
+#ifndef __EXCEPTION_H__
+#define __EXCEPTION_H__
 #include <exception>
+#include <string>
+#include <execinfo.h>
+#include <cxxabi.h>
 
 namespace ham
 {
 
-class Exception : public std::exception
+class Exception: public std::exception
 {
- public:
-  explicit Exception(const char* what);
-  explicit Exception(const string& what);
-  virtual ~Exception() noexcept;
-  virtual const char* what() const noexcept;
-  const char* stackTrace() const noexcept;
+public:
+    explicit Exception(std::string msg);
+    ~Exception() noexcept override {}
 
- private:
-  void fillStackTrace();
-  string demangle(const char* symbol);
+    const char* what()  const noexcept override { return msg_.c_str(); } ;
+    const char* stackTrace() const noexcept { return stack_.c_str(); };
 
-  string message_;      // 错误信息
-  string stack_;        // 保存函数名称
-}; 
+private:
+    std::string fillStack() const noexcept;
+
+private:
+    std::string msg_;
+    std::string stack_;
+};
 
 }
 
-#endif  // MUDUO_BASE_EXCEPTION_H
+#endif // __EXCEPTION_H__
