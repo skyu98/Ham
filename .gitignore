@@ -60,7 +60,7 @@ test/test_runner
 ## Local 
 
 .idea/workspace.xml
-ham/old_base
+ham/old-base/
 build/release/*
 build/debug/*
 build/run/*
