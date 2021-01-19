@@ -23,7 +23,7 @@ namespace ham
             
             for(int i = 1;i < num;++i)
             {
-                printf("%s\n", funcNames[i]);
+                // printf("%s\n", funcNames[i]);
                 char* begin_name = 0, *begin_offset = 0, *end_offset = 0;
                 for(char* pos = funcNames[i];*pos;++pos)
                 {
@@ -42,7 +42,7 @@ namespace ham
 	            *begin_offset++ = '\0';
 	            *end_offset = '\0';
 
-                printf("%s\n", begin_name);
+                // printf("%s\n", begin_name);
 
                 int status = 0;
                 char* res = abi::__cxa_demangle(begin_name, curFuncName, &size, &status);
@@ -61,7 +61,6 @@ namespace ham
             free(curFuncName);
         }
         free(funcNames);
-        printf("end demangle\n");
         return demangled_stack;
     }
 }
