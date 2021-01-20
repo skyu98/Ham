@@ -6,3 +6,12 @@ target_link_libraries(Exception_unittest ham_base)
 
 add_executable(CountDownLatch_unittest CountDownLatch_unittest.cc)
 target_link_libraries(CountDownLatch_unittest ham_base)
+
+add_executable(BlockingQueue_unittest BlockingQueue_unittest.cc)
+target_link_libraries(BlockingQueue_unittest ham_base)
+
+add_executable(BoundedBlockingQueue_unittest BoundedBlockingQueue_unittest.cc)
+target_link_libraries(BoundedBlockingQueue_unittest ham_base)
+
+add_executable(Singleton_unittest Singleton_unittest.cc)
+target_link_libraries(Singleton_unittest ham_base)
