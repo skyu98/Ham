@@ -30,7 +30,8 @@ public:
     void setName(const std::string& name) { name_ = name; }
     const std::string& getName() const { return name_ ;}
 
-    void run(Task newTask);
+    void run(const Task& newTask);
+    void run(Task&& newTask);
 
     void setMaxQueueSize(size_t size) { maxsize_ = size; }
     void setInitCallback(const threadInitCallback& cb) { cb_ = cb; }

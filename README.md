@@ -42,4 +42,7 @@ lock_guard() 比 unique_lock()效率高，后者是为了与wait()搭配使用�
 
 ## 7.threadPool
 替换了锁、move等；没有大的改变。
-要注意这里的run(),task参数不能是右值引用，否则当使用bind()传入类成员函数时，其函数指针会失效。
+take()的时候会阻塞；被唤醒时有两种可能：
+* 1.队列有新任务；此时可以正常pop_front()取任务；
+* 2.isRunning为False了；此时队列是空的，不能再pop_front()取任务；
+所以唤醒时一定要判断queue的状态，来看是不是假唤醒。

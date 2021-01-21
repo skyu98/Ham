@@ -1,5 +1,5 @@
 #include "ThreadPool.h"
-
+#include <iostream>
 namespace ham
 {
     ThreadPool::ThreadPool(const std::string& name)
@@ -11,6 +11,7 @@ namespace ham
     
     ThreadPool::~ThreadPool() 
     {
+        // std::cout << "size is " << queue_.size() << std::endl;
         if(isRunning_)
             stop();
     }
@@ -46,7 +47,7 @@ namespace ham
         }
     }
     
-    void ThreadPool::run(Task newTask) 
+    void ThreadPool::run(const Task& newTask) 
     {
         if(threads_.empty())
             newTask();
@@ -57,15 +58,14 @@ namespace ham
             {
                 notFull_.wait(lock);
             }
-            queue_.push_back(std::move(newTask));
+            queue_.emplace_back(newTask);
+            std::cout << "size is " << queue_.size() << std::endl;
             notEmpty_.notify_one();
         }
     }
     
-    /* Leads to error when newTask is a mem_fun 
     void ThreadPool::run(Task&& newTask) 
     {
-        printf("rvalue task!\n");
         if(threads_.empty())
             newTask();
         {
@@ -78,7 +78,6 @@ namespace ham
         }
         notEmpty_.notify_one();
     }
-    */
     
     ThreadPool::Task ThreadPool::take() 
     {
@@ -87,11 +86,14 @@ namespace ham
         {
             notEmpty_.wait(lock);
         }
-        Task task(std::move(queue_.front()));
-        //Task task(queue_.front());
-        queue_.pop_front();
-        if(maxsize_ > 0)
-            notFull_.notify_one();
+        Task task;
+        if(!queue_.empty())
+        {
+            task = std::move(queue_.front());
+            queue_.pop_front();
+            if(maxsize_ > 0)
+                notFull_.notify_one();
+        }
         return task;
     }
     
