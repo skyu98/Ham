@@ -1,6 +1,8 @@
 #include "../ThreadPool.h"
 #include "../CountDownLatch.h"
 #include <iostream>
+#include <thread>
+#include <functional>
 
 using namespace ham;
 
