@@ -15,3 +15,6 @@ target_link_libraries(BoundedBlockingQueue_unittest ham_base)
 
 add_executable(Singleton_unittest Singleton_unittest.cc)
 target_link_libraries(Singleton_unittest ham_base)
+
+add_executable(ThreadPool_unittest ThreadPool_unittest.cc)
+target_link_libraries(ThreadPool_unittest ham_base)

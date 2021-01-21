@@ -2,7 +2,7 @@ set(base_SRCS
   CountDownLatch.cc
   # CurrentThread.cc
   Exception.cc
-  # ThreadPool.cc
+  ThreadPool.cc
   Timestamp.cc
   )
 

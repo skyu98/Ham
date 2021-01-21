@@ -2,13 +2,11 @@
 
 namespace ham
 {
-    ThreadPool::ThreadPool(const std::string& name, size_t maxsize = 0)
+    ThreadPool::ThreadPool(const std::string& name)
         : isRunning_(false),
           name_(name),
-          maxsize_(maxsize)
+          maxsize_(0)
     {
-        if(cb_)
-            cb_();
     }
     
     ThreadPool::~ThreadPool() 
@@ -21,12 +19,15 @@ namespace ham
     {
         if(!isRunning_)
         {
+            threads_.reserve(numOfThreads);
             isRunning_ = true;
             for(int i = 0;i < numOfThreads;++i)
             {
                 threads_.emplace_back(std::thread(&ThreadPool::threadFunc, this));
             }
         }
+        if(numOfThreads == 0 && cb_)
+            cb_();
     }
     
     void ThreadPool::stop() 
@@ -45,22 +46,26 @@ namespace ham
         }
     }
     
-    void ThreadPool::run(const Task& newTask) 
+    void ThreadPool::run(Task newTask) 
     {
         if(threads_.empty())
             newTask();
-
-        std::unique_lock<std::mutex> lock(mutex_);
-        while(isFull())
+        else
         {
-            notFull_.wait(lock);
+            std::unique_lock<std::mutex> lock(mutex_);
+            while(isFull() && isRunning_)
+            {
+                notFull_.wait(lock);
+            }
+            queue_.push_back(std::move(newTask));
+            notEmpty_.notify_one();
         }
-        queue_.emplace_back(newTask);
-        notEmpty_.notify_one();
     }
     
+    /* Leads to error when newTask is a mem_fun 
     void ThreadPool::run(Task&& newTask) 
     {
+        printf("rvalue task!\n");
         if(threads_.empty())
             newTask();
         {
@@ -73,8 +78,9 @@ namespace ham
         }
         notEmpty_.notify_one();
     }
+    */
     
-    ThreadPool::Task& ThreadPool::take() 
+    ThreadPool::Task ThreadPool::take() 
     {
         std::unique_lock<std::mutex> lock(mutex_);
         while(queue_.empty() && isRunning_)
@@ -82,40 +88,43 @@ namespace ham
             notEmpty_.wait(lock);
         }
         Task task(std::move(queue_.front()));
+        //Task task(queue_.front());
         queue_.pop_front();
-        notFull_.notify_one();
+        if(maxsize_ > 0)
+            notFull_.notify_one();
         return task;
     }
     
     void ThreadPool::threadFunc() 
     {
-        if(cb_)
-            cb_();
-        while(isRunning_)
-        {
-            try
+       try
+        { 
+            if(cb_)
+                cb_();
+            while(isRunning_)
             {
                 Task task(take());
                 if(task)
                     task();
             }
-            catch(const Exception& ex)
-            {
-                std::cerr << "reasons: " << std::string(ex.what()) << std::endl;
-                std::cerr << "stack trace: \n" << std::string(ex.stackTrace()) << std::endl;
-            }
-            catch(const std::exception& e)
-            {
-                std::cerr << e.what() << std::endl;
-            }
-            catch(...)
-            {
-                std::cerr << "unknown error has occured..." << std::endl;
-            }
         }
+        catch(const Exception& ex)
+        {
+            std::cerr << "reasons: " << std::string(ex.what()) << std::endl;
+            std::cerr << "stack trace: \n" << std::string(ex.stackTrace()) << std::endl;
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+        catch(...)
+        {
+            std::cerr << "unknown error has occured..." << std::endl;
+        }
+       
     }
     
-    bool ThreadPool::isFull() 
+    bool ThreadPool::isFull() const
     {
         return maxsize_ > 0 && queue_.size() >= maxsize_;
     }

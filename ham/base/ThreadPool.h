@@ -21,7 +21,7 @@ class ThreadPool : public boost::noncopyable
     typedef std::function<void()> threadInitCallback;
 
 public:
-    ThreadPool(const std::string& name, size_t maxsize = 0);
+    ThreadPool(const std::string& name);
     ~ThreadPool();
 
     void start(int numOfThreads);
@@ -30,17 +30,16 @@ public:
     void setName(const std::string& name) { name_ = name; }
     const std::string& getName() const { return name_ ;}
 
-    void run(const Task& newTask);
-    void run(Task&& newTask);
+    void run(Task newTask);
 
     void setMaxQueueSize(size_t size) { maxsize_ = size; }
     void setInitCallback(const threadInitCallback& cb) { cb_ = cb; }
     size_t queueSize() const;
 
 private:
-    Task& take();
+    Task take();
     void threadFunc();
-    bool isFull();
+    bool isFull() const;
 
     bool isRunning_;
 
