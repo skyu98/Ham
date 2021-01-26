@@ -4,6 +4,7 @@ set(base_SRCS
   Exception.cc
   ThreadPool.cc
   Timestamp.cc
+  Log.cc
   )
 
 add_library(ham_base ${base_SRCS})

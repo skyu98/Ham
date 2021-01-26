@@ -1,0 +1,16 @@
+set(net_SRCS
+  Channel.cc
+  EventLoop.cc
+  )
+
+add_library(ham_net ${net_SRCS})
+target_link_libraries(ham_net pthread)
+
+install(TARGETS ham_net DESTINATION lib)
+
+file(GLOB HEADERS "*.h")
+install(FILES ${HEADERS} DESTINATION include/ham/net)
+
+if(HAM_BUILD_EXAMPLES)
+  add_subdirectory(tests)
+endif()

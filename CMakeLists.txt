@@ -67,6 +67,10 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories(${PROJECT_SOURCE_DIR})
 
+include_directories(
+    ${CMAKE_SOURCE_DIR}/ham  # find spdlog
+)
+
 #link_directories(${PROJECT_BINARY_DIR}/lib)
 link_directories(/usr/local/lib)
 
@@ -74,4 +78,4 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_TYPE}})
 
 add_subdirectory(ham/base)
-#add_subdirectory(ham/net)
+add_subdirectory(ham/net)
