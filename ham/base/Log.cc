@@ -31,25 +31,25 @@ namespace ham
 
             auto logger = std::make_shared<spdlog::logger>(loggerName, sinks.begin(), sinks.end());
 
-            
+            logger->set_level(static_cast<spdlog::level::level_enum>(level));
+            logger->set_pattern("%Y-%m-%d %H:%M:%S [%l] [tid : %t] [%s : %# <%!>] %v");
+            logger->flush_on(spdlog::level::warn);
+
             spdlog::set_default_logger(logger);
 
-            spdlog::set_level(level);
-            // [2020-04-30 16:14:41.816] [console] [info] [main.cpp:608] test info
-            spdlog::set_pattern("%Y-%m-%d %H:%M:%S [%l] [%t] - <%s>|<%#>|<%!>,%v");
-
-            isInitialized_ = true;
-            return true;
+            //printf("the level is %d\n", spdlog::get(loggerName)->level());
         }
         catch(const spdlog::spdlog_ex& ex)
         {
             std::cerr << ex.what() << std::endl;
             return false;
         }
+        isInitialized_ = true;
+        return true;
     }
     
     void Logger::setLevel(const logLevel& level) 
     {
-        spdlog::set_level(level);
+        spdlog::set_level(static_cast<spdlog::level::level_enum>(level));
     }
 }

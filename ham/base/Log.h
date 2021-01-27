@@ -1,5 +1,7 @@
 #ifndef __LOG_H__
 #define __LOG_H__
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE  // 这个宏控制了我们的宏的有效范围
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/rotating_file_sink.h"
@@ -12,14 +14,27 @@
 
 namespace ham
 {
+
 class Logger final : public boost::noncopyable
 {
 public:
-    typedef spdlog::level::level_enum  logLevel;
+
+    enum logLevel
+    {
+        trace = 0,
+        debug = 1,
+        info = 2,
+        warn = 3,
+        err = 4,
+        critical = 5,
+        off = 6,
+        n_levels
+    };
+
     static Logger& Instance();
     bool init(const std::string& loggerName = "Logger",
             const std::string& filePath = "./log/log.txt",
-            logLevel level = spdlog::level::debug);
+            logLevel level = logLevel::debug);
 
     void shutdown() { spdlog::shutdown(); }
     void setLevel(const logLevel&);
