@@ -1,5 +1,6 @@
 #include "net/EventLoop.h"
 #include "net/Channel.h"
+#include <sstream>
 
 namespace ham
 {
@@ -10,6 +11,7 @@ namespace ham
               fd_(fd),
               event_(0),
               revent_(0),
+              status_(status::kNew),
               isHandlingEvent_(false)
         {
             
@@ -18,6 +20,25 @@ namespace ham
         void Channel::update() 
         {
             loop_->updateChannel(this);
+        }
+        
+        std::string eventsToString(int fd, int event) 
+        {
+            std::ostringstream oss;
+            oss << fd << ": ";
+            if (event & EPOLLIN)
+                oss << "IN ";
+            if (event & EPOLLPRI)
+                oss << "PRI ";
+            if (event & EPOLLOUT)
+                oss << "OUT ";
+            if (event & EPOLLHUP)
+                oss << "HUP ";
+            if (event & EPOLLRDHUP)
+                oss << "RDHUP ";
+            if (event & EPOLLERR)
+                oss << "ERR ";
+            return oss.str();
         }
         
         /*

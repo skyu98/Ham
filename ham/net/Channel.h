@@ -21,8 +21,21 @@ class Channel  //: public std::enable_shared_from_this<Channel>
     typedef std::function<void(Timestamp)> ReadEventCallback;
 
 public:
+    enum status
+    {
+        kNew,       // 0
+        kAdded,     // 1
+        kDismissed,   // 2
+        n_status
+    };
+
+public:
     Channel(EventLoop* loop, int fd);
-    const int fd() const{ return fd_;}
+    const int getFd() const{ return fd_;}
+    const int getEvent() const { return event_; }
+    const int getStatus() const { return status_; }
+    void setStatus(Channel::status newStatus) { status_ = newStatus; }
+
 
     /* set callbacks which is called when different revents come */
     void setReadCallback(const ReadEventCallback& cb) { readCb_ = cb; }
@@ -37,12 +50,17 @@ public:
     void disableWriting() { event_ &= ~kWriteEvent_; update(); }
     void disableAll() { event_ = kNoneEvent_; update(); }
 
+    void setRevent(uint32_t revent) { revent_ = revent; }
     void handleEvent();
 
     EventLoop* ownerLoop() const { return loop_; }
 
+    std::string eventsToString() const { return eventsToString(fd_, event_); }
+    std::string reventsToString() const  { return eventsToString(fd_, revent_); }
     
 private:
+    static std::string eventsToString(int fd, int event);
+
     void update();  // tell loop I'm ready, please update me.
     void handleEventWithGuard(Timestamp);
 
@@ -50,7 +68,10 @@ private:
     const int fd_;
     int event_;
     int revent_; 
+    Channel::status status_;
     bool isHandlingEvent_;
+
+    
 
     static const int kReadEvent_ = EPOLLIN | EPOLLPRI;
     static const int kWriteEvent_ = EPOLLOUT;
