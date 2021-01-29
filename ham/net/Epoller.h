@@ -1,12 +1,12 @@
 #ifndef __EpOLLER_H__
 #define __EpOLLER_H__
 
-#define OPEN_MAX 1024
 #include <sys/epoll.h>
 #include <boost/noncopyable.hpp>
 #include <vector>
+#include <map>
+#include <string>
 
-#include "net/Channel.h"
 #include "base/Timestamp.h"
 
 namespace ham
@@ -14,26 +14,29 @@ namespace ham
 namespace net
 {
 class EventLoop;
+class Channel;
 
 class Epoller : public boost::noncopyable
 {
 public:
-    Epoller(EventLoop*, int size = 1024);
+    Epoller(EventLoop*);
     ~Epoller();
 
     Timestamp wait(const int kEpollTimeMs, std::vector<Channel*>& ActiveChannels);
 
     void updateChannel(Channel*);
     void removeChannel(Channel*);
-    void fillActiveChannels(std::vector<Channel*>& ActiveChannels);
-
+    void fillActiveChannels(int numOfEvents, std::vector<Channel*>& ActiveChannels) const;
+    
 private:
+    static std::string operationToString(int op);
     void update(int op, Channel*);
 
     EventLoop* loop_;
     int epoll_fd_;
-    struct epoll_event retChannels_[OPEN_MAX];
-    
+    static const int kInitEventListSize = 16;
+    std::vector<struct epoll_event> retEpoll_event_;
+    std::map<int, Channel*> channelMap_;    // use for debug mode
 };
 }
 }
