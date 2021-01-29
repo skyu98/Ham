@@ -1,20 +1,67 @@
 #ifndef __CHANNEL_H__
 #define __CHANNEL_H__
+#include "base/Timestamp.h"
+#include "base/Log.h"
+#include "net/Epoller.h"
+
 #include <memory>
+#include <functional>
+
 
 namespace ham
 {
 namespace net
 {
+
 class EventLoop;
 
-class Channel : public std::enable_shared_from_this<Channel>
+class Channel  //: public std::enable_shared_from_this<Channel>
 {
+    typedef std::function<void()> EventCallback;
+    typedef std::function<void(Timestamp)> ReadEventCallback;
+
 public:
-    Channel(std::shared_ptr<EventLoop>);
+    Channel(EventLoop* loop, int fd);
+    const int fd() const{ return fd_;}
+
+    /* set callbacks which is called when different revents come */
+    void setReadCallback(const ReadEventCallback& cb) { readCb_ = cb; }
+    void setWriteCallback(const EventCallback& cb) { writeCb_ = cb; }
+    void setCloseCallback(const EventCallback& cb) { closeCb_ = cb; }
+    void setErrorCallback(const EventCallback& cb) { errorCb_ = cb; }
+
+    /* change the state of event_ */
+    void enableReading() { event_ |= kReadEvent_; update(); }
+    void enableWriting() { event_ |= kWriteEvent_; update(); }
+    // disableReading() is not needed
+    void disableWriting() { event_ &= ~kWriteEvent_; update(); }
+    void disableAll() { event_ = kNoneEvent_; update(); }
+
+    void handleEvent();
+
+    EventLoop* ownerLoop() const { return loop_; }
+
     
 private:
-    std::shared_ptr<EventLoop> loop_;  // 循环引用。裸指针就行，实在不行就weak_ptr<>
+    void update();  // tell loop I'm ready, please update me.
+    void handleEventWithGuard(Timestamp);
+
+    EventLoop* loop_;  // 循环引用。裸指针就行，实在不行就weak_ptr<>
+    const int fd_;
+    int event_;
+    int revent_; 
+    bool isHandlingEvent_;
+
+    static const int kReadEvent_ = EPOLLIN | EPOLLPRI;
+    static const int kWriteEvent_ = EPOLLOUT;
+    static const int kNoneEvent_ = 0;
+
+    // Callbacks
+    ReadEventCallback readCb_;
+    EventCallback writeCb_;
+    EventCallback closeCb_;
+    EventCallback errorCb_;
+
 };
 }
 }
