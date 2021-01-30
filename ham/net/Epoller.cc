@@ -70,17 +70,50 @@ namespace ham
                 channel->setStatus(Channel::status::kAdded);
                 update(EPOLL_CTL_ADD, channel);
             }
+            else
+            // an existing one , add with EPOLL_CTL_MOD/DEL
+            {
+                assert(channelMap_.find(fd) != channelMap_.end());
+                assert(channelMap_[fd] == channel);
+                assert(status == Channel::status::kAdded);
+                if(channel->isNoneEvent())
+                {
+                    update(EPOLL_CTL_DEL, channel);
+                    channel->setStatus(Channel::status::kDismissed);
+                }
+                else
+                    update(EPOLL_CTL_MOD, channel);
+            }
+            
         }
         
-        void Epoller::removeChannel(Channel*) 
+        void Epoller::removeChannel(Channel* channel) 
         {
+            loop_->assertInLoopThread();
+
+            int fd = channel->getFd();
+            auto status = channel->getStatus();
+
+            TRACE("fd = {}, is going to be removed...", fd);
+            assert(channel->isNoneEvent());
+            assert(channelMap_.find(fd) != channelMap_.end());
+            assert(channelMap_[fd] == channel);
+            assert(status == Channel::status::kAdded ||
+                    status == Channel::status::kDismissed);
             
+            size_t n = channelMap_.erase(fd);
+            assert(n == 1);
+
+            if(status == Channel::status::kAdded)
+                update(EPOLL_CTL_MOD, channel);
+            channel->setStatus(Channel::status::kNew);
         }
         
         void Epoller::update(int op, Channel* channel) 
         {
             struct epoll_event tmp;
             int fd = channel->getFd();
+            
             tmp.data.ptr = static_cast<void*>(channel);
             tmp.data.fd = fd, tmp.events = channel->getEvent();
 
