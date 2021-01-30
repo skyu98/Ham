@@ -1,8 +1,12 @@
 #ifndef __EVENTLOOP_H__
 #define __EVENTLOOP_H__
+#include "base/Timestamp.h"
+#include "net/SocketOps.h"
+
 #include <memory>
 #include <vector>
 #include <functional>
+#include <mutex>
 #include <boost/noncopyable.hpp>
 
 namespace ham
@@ -33,20 +37,29 @@ public:
     void abortNotInLoopThread();
     void assertInLoopThread();
 
+    void runInLoop(const Functor& func);
+
 private:
+    void wakeup();
     void handleWakeupFd();
+    void queueInLoop(const Functor& pendingfunc);
+    void doPendingFunctors();
 
     bool looping_;
     bool quit_;
     bool eventHandling_;
+    bool callingPendingFunctors_;
 
     pid_t threadId_;
     int wakeup_fd_;
+    Timestamp epollerReturnTime_;
+    std::mutex mutex_;
 
     std::unique_ptr<Epoller> epoller_;
     std::unique_ptr<Channel> wakeupChannel_;
     ChannelList activeChannels_;
     std::shared_ptr<Channel> currentActiveChannel_;
+    std::vector<Functor> pendingFunctors_;
 };
 }
 }

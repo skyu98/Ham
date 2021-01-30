@@ -39,6 +39,7 @@ EventLoop::EventLoop()
     : looping_(false),
       quit_(false),
       eventHandling_(false),
+      callingPendingFunctors_(false),
       threadId_(::tid()),
       wakeup_fd_(::createEventfd()),
       epoller_(util::make_unique<Epoller>(this)),
@@ -68,7 +69,14 @@ void EventLoop::loop()
     looping_ = true;
     while(!quit_)
     {
-      
+        epollerReturnTime_ = epoller_->wait(kEpollTimeMs, activeChannels_); 
+        eventHandling_ = true;
+        for(const auto& channel : activeChannels_)
+        {
+            channel->handleEvent(epollerReturnTime_);
+        }
+        eventHandling_ = false;
+        doPendingFunctors();
     }
 }
 
@@ -94,12 +102,53 @@ void EventLoop::removeChannel(Channel* channel)
 void EventLoop::abortNotInLoopThread() 
 {
     CRITICAL("EventLoop::abortNotInLoopThread - EventLoop {} was created in threadId_ = {}, current thread id = {}!!!",
-              fmt::ptr(this), threadId_, ::tid());
+            fmt::ptr(this), threadId_, ::tid());
     abort();
 }
 
 void EventLoop::assertInLoopThread() 
 {
     if(!isInLoopThread())
-      abortNotInLoopThread();
+        abortNotInLoopThread();
+}
+
+
+void EventLoop::runInLoop(const Functor& func) 
+{
+    if(isInLoopThread())
+        func();
+    queueInLoop(func);
+}
+
+void EventLoop::queueInLoop(const Functor& pendingFunc) 
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        pendingFunctors_.emplace_back(pendingFunc);
+    }
+    if(!isInLoopThread() || callingPendingFunctors_)
+        wakeup();
+  
+}
+
+void EventLoop::wakeup() 
+{
+    uint64_t one = 1;
+    ssize_t n = socket::write(wakeup_fd_, &one, sizeof(one));
+    if(n != sizeof(one))
+        ERROR("EventLoop::wakeup() writes {} bytes instead of 8", n);
+}
+
+void EventLoop::handleWakeupFd() 
+{
+    uint64_t one = 1;
+    ssize_t n = socket::read(wakeup_fd_, &one, sizeof(one));
+    if(n != sizeof(one)) {
+        ERROR("EventLoop::handleRead reads {} bytes instead of 8 ", n);
+    }   
+}
+
+void EventLoop::doPendingFunctors() 
+{
+  
 }
