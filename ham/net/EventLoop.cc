@@ -101,6 +101,11 @@ void EventLoop::removeChannel(Channel* channel)
     epoller_->removeChannel(channel);
 }
 
+bool EventLoop::isInLoopThread() const
+{
+    return threadId_ == CurrentThread::gettid();
+}
+
 void EventLoop::abortNotInLoopThread() 
 {
     CRITICAL("EventLoop::abortNotInLoopThread - EventLoop {} was created in threadId_ = {}, current thread id = {}!!!",

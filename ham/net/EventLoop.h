@@ -14,12 +14,6 @@ namespace ham
 namespace net
 {
 
-namespace CurrentThread
-{
-    //thread_local static pid_t currentThreadId;
-    pid_t gettid();
-}
-
 class Channel;
 class Epoller;
 
