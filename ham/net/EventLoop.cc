@@ -3,12 +3,14 @@
 #include "net/Epoller.h"
 #include "base/Log.h"
 #include "base/Util.h"
-#include "base/CurrentThread.h"
+#include "net/CurrentThread.h"
 #include <sys/eventfd.h>
 #include <thread>
 
 using namespace ham;
 using namespace ham::net;
+
+thread_local pid_t CurrentThread::currentThreadId = 0;
 
 namespace
 {

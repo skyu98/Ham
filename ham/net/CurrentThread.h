@@ -7,9 +7,9 @@ namespace ham
 {
 namespace CurrentThread
 {
-thread_local static int currentThreadId = 0;
+extern thread_local pid_t currentThreadId;  // EventLoop.cc
 
-int tid()
+inline pid_t tid()
 {
   if(currentThreadId == 0)
     currentThreadId = util::gettid();
