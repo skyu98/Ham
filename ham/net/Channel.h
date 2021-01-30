@@ -31,9 +31,9 @@ public:
 
 public:
     Channel(EventLoop* loop, int fd);
-    const int getFd() const{ return fd_;}
-    const int getEvent() const { return event_; }
-    const int getStatus() const { return status_; }
+    int getFd() const{ return fd_;}
+    int getEvent() const { return event_; }
+    int getStatus() const { return status_; }
     void setStatus(Channel::status newStatus) { status_ = newStatus; }
 
 
@@ -50,6 +50,7 @@ public:
     void disableWriting() { event_ &= ~kWriteEvent_; update(); }
     void disableAll() { event_ = kNoneEvent_; update(); }
     bool isNoneEvent() const { return event_ == kNoneEvent_; }
+    void remove() { loop_->removeChannel(this); }
 
     void setRevent(uint32_t revent) { revent_ = revent; }
     void handleEvent(Timestamp retTime) { handleEventWithGuard(retTime); }
