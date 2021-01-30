@@ -1,2 +1,2 @@
-add_executable(EventLoop_unittest EventLoop_unittest.cc)
-target_link_libraries(EventLoop_unittest ham_net)
+add_executable(Reactor_test01 Reactor_test01.cc)
+target_link_libraries(Reactor_test01 ham_net)
