@@ -49,9 +49,10 @@ public:
     // disableReading() is not needed
     void disableWriting() { event_ &= ~kWriteEvent_; update(); }
     void disableAll() { event_ = kNoneEvent_; update(); }
+    bool isNoneEvent() const { return event_ == kNoneEvent_; }
 
     void setRevent(uint32_t revent) { revent_ = revent; }
-    void handleEvent();
+    void handleEvent(Timestamp retTime) { handleEventWithGuard(retTime); }
 
     EventLoop* ownerLoop() const { return loop_; }
 
