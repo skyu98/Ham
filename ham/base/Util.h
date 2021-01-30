@@ -1,3 +1,6 @@
+#ifndef __UTIL_H__
+#define __UTIL_H__
+
 #include <sstream>
 #include <memory>
 #include <thread>
@@ -33,3 +36,4 @@ inline pid_t gettid() {
 } // namespace util
 
 } // namespace ham
+#endif // __UTIL_H__

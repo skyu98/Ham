@@ -1,3 +1,6 @@
+#ifndef __CURRENTTHREAD_H__
+#define __CURRENTTHREAD_H__
+
 #include "base/Util.h"
 
 namespace ham
@@ -14,3 +17,4 @@ pid_t gettid()
 }
 }
 }
+#endif // __CURRENTTHREAD_H__
