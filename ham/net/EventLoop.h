@@ -34,7 +34,7 @@ public:
     void updateChannel(Channel*);
     void removeChannel(Channel*);
 
-    bool isInLoopThread() const { return threadId_ == CurrentThread::gettid(); }
+    bool isInLoopThread() const;
     void abortNotInLoopThread();
     void assertInLoopThread();
 
