@@ -9,18 +9,22 @@
 using namespace ham;
 using namespace ham::net;
 
-namespace
+namespace CurrentThread
 {
-thread_local EventLoop* t_loopInThisThread = nullptr;
 thread_local static pid_t currentThreadId = 0;
 
-pid_t tid()
+pid_t gettid()
 {
   if(currentThreadId == 0)
     currentThreadId = ::util::gettid();
   return currentThreadId;
 }
+}
 
+
+namespace
+{
+thread_local EventLoop* t_loopInThisThread = nullptr;
 const int kEpollTimeMs = 10000;
 
 int createEventfd()
@@ -40,15 +44,15 @@ EventLoop::EventLoop()
       quit_(false),
       eventHandling_(false),
       callingPendingFunctors_(false),
-      threadId_(::tid()),
+      threadId_(CurrentThread::gettid()),
       wakeup_fd_(::createEventfd()),
       epoller_(util::make_unique<Epoller>(this)),
-      wakeupChannel_(util::make_unique<Channel>(wakeup_fd_))
+      wakeupChannel_(util::make_unique<Channel>(this, wakeup_fd_))
 {
     TRACE("EventLoop created {} ", fmt::ptr(this));
     if(t_loopInThisThread)
     {
-        CRITICAL("Another EventLoop {} exists in this Thread( tid = {} ) ...", fmt::ptr(t_loopInThisThread), ::tid()); 
+        CRITICAL("Another EventLoop {} exists in this Thread( tid = {} ) ...", fmt::ptr(t_loopInThisThread), CurrentThread::gettid()); 
     }
     else
     {
@@ -62,6 +66,12 @@ EventLoop::EventLoop()
 EventLoop::~EventLoop() 
 {
     assert(quit_);
+    DEBUG("EventLoop {} of thread {} destructs", 
+        fmt::ptr(this), threadId_)
+    wakeupChannel_->disableAll();
+    wakeupChannel_->remove();
+    ::close(wakeup_fd_);
+    t_loopInThisThread = nullptr;
 }
 
 void EventLoop::loop() 
@@ -78,11 +88,13 @@ void EventLoop::loop()
         eventHandling_ = false;
         doPendingFunctors();
     }
+    TRACE("EventLoop {} stop looping", fmt::ptr(this));
+    looping_ = false;
 }
 
 void EventLoop::quit() 
 {
-  
+    assert(quit_ == true);
 }
 
 void EventLoop::updateChannel(Channel* channel) 
@@ -102,7 +114,7 @@ void EventLoop::removeChannel(Channel* channel)
 void EventLoop::abortNotInLoopThread() 
 {
     CRITICAL("EventLoop::abortNotInLoopThread - EventLoop {} was created in threadId_ = {}, current thread id = {}!!!",
-            fmt::ptr(this), threadId_, ::tid());
+            fmt::ptr(this), threadId_, CurrentThread::gettid());
     abort();
 }
 
@@ -150,5 +162,15 @@ void EventLoop::handleWakeupFd()
 
 void EventLoop::doPendingFunctors() 
 {
-  
+    std::vector<Functor> Functors;
+    callingPendingFunctors_ = true;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        Functors.swap(pendingFunctors_);
+    }
+    for(const auto& func : Functors)
+    {
+        func();
+    }
+    callingPendingFunctors_ = false;
 }

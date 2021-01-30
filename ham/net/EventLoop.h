@@ -13,6 +13,13 @@ namespace ham
 {
 namespace net
 {
+
+namespace CurrentThread
+{
+    //thread_local static pid_t currentThreadId;
+    pid_t gettid();
+}
+
 class Channel;
 class Epoller;
 
@@ -33,7 +40,7 @@ public:
     void updateChannel(Channel*);
     void removeChannel(Channel*);
 
-    bool EventLoop::isInLoopThread() const;
+    bool isInLoopThread() const { return threadId_ == CurrentThread::gettid(); }
     void abortNotInLoopThread();
     void assertInLoopThread();
 
