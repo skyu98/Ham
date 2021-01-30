@@ -6,12 +6,12 @@
 using namespace ham;
 using namespace ham::net;
 
-// extern pid_t gettid(); 匿名命名空间下相当于static，不能跨文件；除非加extern
+// extern pid_t tid(); 匿名命名空间下相当于static，不能跨文件；除非加extern
 
 void threadFunc()
 {
     std::cout << "In thread pid = " << std::this_thread::get_id()
-            << " tid = " << CurrentThread::gettid() << std::endl;
+            << " tid = " << CurrentThread::tid() << std::endl;
     EventLoop loop;
     loop.loop();
 }
@@ -24,7 +24,7 @@ int main()
         return -1;
     }
     std::cout << "In thread pid = " << std::this_thread::get_id()
-            << " tid = " << CurrentThread::gettid() << std::endl;
+            << " tid = " << CurrentThread::tid() << std::endl;
     EventLoop loop;
 
     std::thread t(threadFunc);

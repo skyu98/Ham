@@ -33,7 +33,7 @@ EventLoop::EventLoop()
       quit_(false),
       eventHandling_(false),
       callingPendingFunctors_(false),
-      threadId_(CurrentThread::gettid()),
+      threadId_(CurrentThread::tid()),
       wakeup_fd_(::createEventfd()),
       epoller_(util::make_unique<Epoller>(this)),
       wakeupChannel_(util::make_unique<Channel>(this, wakeup_fd_))
@@ -41,7 +41,7 @@ EventLoop::EventLoop()
     TRACE("EventLoop created {} ", fmt::ptr(this));
     if(t_loopInThisThread)
     {
-        CRITICAL("Another EventLoop {} exists in this Thread( tid = {} ) ...", fmt::ptr(t_loopInThisThread), CurrentThread::gettid()); 
+        CRITICAL("Another EventLoop {} exists in this Thread( tid = {} ) ...", fmt::ptr(t_loopInThisThread), CurrentThread::tid()); 
     }
     else
     {
@@ -103,13 +103,13 @@ void EventLoop::removeChannel(Channel* channel)
 
 bool EventLoop::isInLoopThread() const
 {
-    return threadId_ == CurrentThread::gettid();
+    return threadId_ == CurrentThread::tid();
 }
 
 void EventLoop::abortNotInLoopThread() 
 {
     CRITICAL("EventLoop::abortNotInLoopThread - EventLoop {} was created in threadId_ = {}, current thread id = {}!!!",
-            fmt::ptr(this), threadId_, CurrentThread::gettid());
+            fmt::ptr(this), threadId_, CurrentThread::tid());
     abort();
 }
 

@@ -9,7 +9,7 @@ namespace CurrentThread
 {
 thread_local static pid_t currentThreadId = 0;
 
-pid_t gettid()
+pid_t tid()
 {
   if(currentThreadId == 0)
     currentThreadId = util::gettid();
