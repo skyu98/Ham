@@ -48,7 +48,7 @@ public:
 
 private:
     void wakeup();
-    void handleWakeupFd();
+    void handleWakeupFd(Timestamp receiveTime);
     void queueInLoop(const Functor& pendingfunc);
     void doPendingFunctors();
 

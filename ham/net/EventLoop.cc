@@ -59,7 +59,8 @@ EventLoop::EventLoop()
         t_loopInThisThread = this;
     }
     
-    wakeupChannel_->setReadCallback(std::mem_fn(&EventLoop::handleWakeupFd));
+    wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleWakeupFd, this, 
+                                    std::placeholders::_1));
     wakeupChannel_->enableReading();
 }
 
@@ -151,7 +152,7 @@ void EventLoop::wakeup()
         ERROR("EventLoop::wakeup() writes {} bytes instead of 8", n);
 }
 
-void EventLoop::handleWakeupFd() 
+void EventLoop::handleWakeupFd(Timestamp receiveTime) 
 {
     uint64_t one = 1;
     ssize_t n = socket::read(wakeup_fd_, &one, sizeof(one));
