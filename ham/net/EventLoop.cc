@@ -10,7 +10,6 @@
 using namespace ham;
 using namespace ham::net;
 
-
 namespace
 {
 thread_local EventLoop* t_loopInThisThread = nullptr;
@@ -33,7 +32,7 @@ EventLoop::EventLoop()
       quit_(false),
       eventHandling_(false),
       callingPendingFunctors_(false),
-      threadId_(CurrentThread::tid()),
+      threadId_(static_cast<pid_t>(CurrentThread::tid())),
       wakeup_fd_(::createEventfd()),
       epoller_(util::make_unique<Epoller>(this)),
       wakeupChannel_(util::make_unique<Channel>(this, wakeup_fd_))

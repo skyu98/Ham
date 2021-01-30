@@ -7,9 +7,9 @@ namespace ham
 {
 namespace CurrentThread
 {
-thread_local static pid_t currentThreadId = 0;
+thread_local static int currentThreadId = 0;
 
-pid_t tid()
+int tid()
 {
   if(currentThreadId == 0)
     currentThreadId = util::gettid();
