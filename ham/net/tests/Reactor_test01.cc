@@ -1,6 +1,8 @@
 #include "net/EventLoop.h"
+#include "base/CurrentThread.h"
 #include "base/Log.h"
 #include <thread>
+
 using namespace ham;
 using namespace ham::net;
 

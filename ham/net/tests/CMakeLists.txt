@@ -1,2 +1,2 @@
 add_executable(Reactor_test01 Reactor_test01.cc)
-target_link_libraries(Reactor_test01 ham_net)
+target_link_libraries(Reactor_test01  ham_net ham_base)

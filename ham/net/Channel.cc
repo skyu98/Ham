@@ -22,7 +22,7 @@ namespace ham
             loop_->updateChannel(this);
         }
         
-        std::string eventsToString(int fd, int event) 
+        std::string Channel::eventsToString(int fd, int event) 
         {
             std::ostringstream oss;
             oss << fd << ": ";

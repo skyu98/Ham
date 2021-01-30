@@ -17,7 +17,7 @@ int socket::socket(){
 
 int socket::bind(int sockfd, const struct sockaddr_in& address){
 	int ret = 0;
-	ret = bind(sockfd, static_cast<SA*>((void*)&address), sizeof address);
+	//ret = bind(sockfd, static_cast<SA*>((void*)&address), sizeof(address));
 	if(ret == -1)
 	{
 		ERROR("bind error");
