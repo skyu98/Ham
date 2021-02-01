@@ -3,6 +3,8 @@ namespace ham
 {
     namespace net
     {
+        AtomicInt64 Timer::s_numCreated_(0);
+        
         Timer::Timer(const TimerCallback& cb, Timestamp when, double interval) 
             : callback_(cb),
               expiration_(when),

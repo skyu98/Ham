@@ -160,8 +160,10 @@ namespace ham
         // Return value optimization
         std::vector<TimerQueue::timeEntry> TimerQueue::getExpired(Timestamp now) 
         {
-            timeEntry helper(now, std::make_shared<Timer>(UINTPTR_MAX));
+            timeEntry helper(now, std::shared_ptr<Timer>());
             auto lastExpired = timerList_.lower_bound(helper);
+            if(lastExpired != timerList_.end() && lastExpired->first == now)
+                ++lastExpired;
             assert(lastExpired == timerList_.end() || lastExpired->first > now);
 
             std::vector<timeEntry> expired;
