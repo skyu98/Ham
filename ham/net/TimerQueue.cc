@@ -15,11 +15,11 @@ namespace ham
         {
             int create_alarmFd()
             {
-                int alarmFd = ::timerfd_create(CLOCK_MONOTONIC,
-                                                TFD_NONBLOCK | TFD_CLOEXEC);
+                int alarmFd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
                 if(alarmFd < 0)
+                {
                     CRITICAL("Failed in create_alarmFd");
-
+                }
                 return alarmFd;
             }
 
@@ -63,7 +63,6 @@ namespace ham
                     ERROR("timerfd_settime()");
                 }
             }
-
         }
 
         TimerQueue::TimerQueue(EventLoop* loop)

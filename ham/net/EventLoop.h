@@ -62,13 +62,13 @@ private:
     pid_t threadId_;
     int wakeup_fd_;
     Timestamp epollerReturnTime_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
 
     std::unique_ptr<Epoller> epoller_;
     std::unique_ptr<Channel> wakeupChannel_;
     std::unique_ptr<TimerQueue> timerQueue_;
     ChannelList activeChannels_;
-    std::shared_ptr<Channel> currentActiveChannel_;
+    // std::shared_ptr<Channel> currentActiveChannel_;
     std::vector<Functor> pendingFunctors_;
 };
 }

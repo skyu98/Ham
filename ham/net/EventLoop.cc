@@ -24,7 +24,6 @@ int createEventfd()
   if (evtfd < 0)
   {
     ERROR("Failed in eventfd");
-    abort();
   }
   return evtfd;
 }
@@ -114,20 +113,23 @@ void EventLoop::abortNotInLoopThread()
 {
     CRITICAL("EventLoop::abortNotInLoopThread - EventLoop {} was created in threadId_ = {}, current thread id = {}!!!",
             fmt::ptr(this), threadId_, CurrentThread::tid());
-    abort();
 }
 
 void EventLoop::assertInLoopThread() 
 {
     if(!isInLoopThread())
+    {
         abortNotInLoopThread();
+    }
 }
 
 
 void EventLoop::runInLoop(const Functor& func) 
 {
     if(isInLoopThread())
+    {
         func();
+    }
     queueInLoop(func);
 }
 
@@ -160,7 +162,10 @@ void EventLoop::queueInLoop(const Functor& pendingFunc)
         pendingFunctors_.emplace_back(pendingFunc);
     }
     if(!isInLoopThread() || callingPendingFunctors_)
+    {
         wakeup();
+    }
+        
   
 }
 
@@ -169,7 +174,9 @@ void EventLoop::wakeup()
     uint64_t one = 1;
     ssize_t n = socket::write(wakeup_fd_, &one, sizeof(one));
     if(n != sizeof(one))
+    {
         ERROR("EventLoop::wakeup() writes {} bytes instead of 8", n);
+    }
 }
 
 void EventLoop::handleWakeupFd(Timestamp receiveTime) 
