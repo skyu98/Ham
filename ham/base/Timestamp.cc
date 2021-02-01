@@ -14,8 +14,8 @@ namespace ham
 
     std::string Timestamp::toString() const
     {
-        return std::to_string(microsecondsFromEpoch_ / kMicrosecondsPerSencond)
-            + "." + std::to_string(microsecondsFromEpoch_ % kMicrosecondsPerSencond);
+        return std::to_string(microsecondsFromEpoch_ / kMicrosecondsPerSecond)
+            + "." + std::to_string(microsecondsFromEpoch_ % kMicrosecondsPerSecond);
     }
     
     Timestamp Timestamp::now() 
