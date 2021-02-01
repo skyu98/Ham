@@ -111,6 +111,8 @@ namespace ham
                 entry.second->run();
             }
             callingExpiredTimers_ = false;
+
+            reset(expired, now);
         }
         
         void TimerQueue::addTimerInLoop(std::shared_ptr<Timer> timer) 
@@ -155,9 +157,38 @@ namespace ham
             }
         }
         
+        // Return value optimization
         std::vector<TimerQueue::timeEntry> TimerQueue::getExpired(Timestamp now) 
         {
+            timeEntry helper(now, std::make_shared<Timer>(UINTPTR_MAX));
+            auto lastExpired = timerList_.lower_bound(helper);
+            assert(lastExpired == timerList_.end() || lastExpired->first > now);
+
+            std::vector<timeEntry> expired;
+            std::copy(timerList_.begin(), lastExpired, std::back_inserter(expired));
+
+            timerList_.erase(timerList_.begin(), lastExpired);
+            return expired;
+        }
+        
+        void TimerQueue::reset(const std::vector<timeEntry>& expired, Timestamp now) 
+        {
+            for(const auto& expiredTimer : expired)
+            {
+                if(expiredTimer.second->repeat() && 
+                    cancelingTimers_.find(expiredTimer.second) == cancelingTimers_.end())
+                {
+                    expiredTimer.second->restart(now);
+                    insert(expiredTimer.second);
+                }
+            }
+
+            Timestamp nextExpired;
+            if(!timerList_.empty())
+                nextExpired = timerList_.begin()->second->expiration();
             
+            if(nextExpired.valid())
+                detail::resetAlarmFd(alarmFd_, nextExpired);
         }
     }
 }
