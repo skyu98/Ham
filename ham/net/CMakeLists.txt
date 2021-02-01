@@ -3,6 +3,7 @@ set(net_SRCS
   EventLoop.cc
   Epoller.cc
   SocketOps.cc
+  Timer.cc
   )
 
 add_library(ham_net ${net_SRCS})
