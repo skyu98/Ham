@@ -46,3 +46,15 @@ take()的时候会阻塞；被唤醒时有两种可能：
 * 1.队列有新任务；此时可以正常pop_front()取任务；
 * 2.isRunning为False了；此时队列是空的，不能再pop_front()取任务；
 所以唤醒时一定要判断queue的状态，来看是不是假唤醒。
+
+## 8.Epoller
+```cpp
+typedef union epoll_data
+{
+  void *ptr;
+  int fd;
+  uint32_t u32;
+  uint64_t u64;
+} epoll_data_t;
+```
+struct epoll_event里的data是个共用体Union，共享同一片内存，所以只能写一个成员，否则数据会被覆盖；导致ptr不能指向有效的channel。
