@@ -70,6 +70,7 @@ void EventLoop::loop()
     looping_ = true;
     while(!quit_)
     {
+        activeChannels_.clear();
         epollerReturnTime_ = epoller_->wait(kEpollTimeMs, activeChannels_); 
         eventHandling_ = true;
         for(const auto& channel : activeChannels_)
