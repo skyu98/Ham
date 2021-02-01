@@ -130,7 +130,10 @@ void EventLoop::runInLoop(const Functor& func)
     {
         func();
     }
-    queueInLoop(func);
+    else
+    {
+        queueInLoop(func);
+    }
 }
 
 TimerId EventLoop::runAt(const Timestamp& time, const TimerCallback& cb) 

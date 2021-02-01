@@ -167,8 +167,8 @@ namespace ham
 
             std::vector<timeEntry> expired;
             std::copy(timerList_.begin(), lastExpired, std::back_inserter(expired));
-
             timerList_.erase(timerList_.begin(), lastExpired);
+
             return expired;
         }
         
