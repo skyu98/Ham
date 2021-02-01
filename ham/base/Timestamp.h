@@ -35,7 +35,7 @@ public:
     static Timestamp now(); 
     static Timestamp invalid();
 
-    static const int kMicrosecondsPerSencond = 1000 * 1000;
+    static const int kMicrosecondsPerSecond = 1000 * 1000;
 
 private:
     int64_t microsecondsFromEpoch_;
@@ -54,14 +54,14 @@ inline bool operator==(Timestamp lhs, Timestamp rhs)
 inline double timeDifference(Timestamp lhs, Timestamp rhs)
 {
     int64_t diff = lhs.microsecondsFromEpoch() - rhs.microsecondsFromEpoch();
-    diff /= Timestamp::kMicrosecondsPerSencond;
+    diff /= Timestamp::kMicrosecondsPerSecond;
     return static_cast<double>(diff);
 }
 
 inline Timestamp addTime(Timestamp src, double secondsToBeAdded)
 {
     int64_t microseconds = static_cast<int64_t>(secondsToBeAdded * 
-                                                Timestamp::kMicrosecondsPerSencond);
+                                                Timestamp::kMicrosecondsPerSecond);
     return Timestamp(microseconds);
 }
 
