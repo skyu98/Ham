@@ -21,7 +21,7 @@ namespace ham
             }
             else
             {
-                expiration_ = Timerstamp::invalid();
+                expiration_ = Timestamp::invalid();
             }
         }
     }
