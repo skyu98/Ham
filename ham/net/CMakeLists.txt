@@ -4,6 +4,7 @@ set(net_SRCS
   Epoller.cc
   SocketOps.cc
   Timer.cc
+  TimerQueue.cc
   )
 
 add_library(ham_net ${net_SRCS})
