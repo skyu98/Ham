@@ -87,7 +87,11 @@ void EventLoop::loop()
 
 void EventLoop::quit() 
 {
-    assert(quit_ == true);
+    quit_ = true;
+    if(!isInLoopThread())
+    {
+        wakeup(); // 跨线程调用时，可能正在handleEvent，也可能wait阻塞住，所以要去唤醒，所以我们需要个唤醒通道
+    }
 }
 
 void EventLoop::updateChannel(Channel* channel) 
