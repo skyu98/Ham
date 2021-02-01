@@ -1,13 +1,14 @@
 #ifndef __TIMERID_H__
 #define __TIMERID_H__
 #include <stdint.h>
+#include <memory>
 namespace ham
 {
 namespace net
 {
 class Timer;
 
-class TimerId
+class TimerId  // TODO : what if we use a map<serialNum, Timer*> to replace this class ?
 {
 
 public:
@@ -17,7 +18,7 @@ public:
     {}
 
     TimerId(Timer* timer, int64_t serialNum)
-        : timer_(timer),
+        : timer_(std::make_shared<Timer>(timer)),
           serialNum_(serialNum)
     {}
     
@@ -25,7 +26,7 @@ public:
 
 private:
     /* data */
-    Timer* timer_;
+    std::shared_ptr<Timer> timer_;
     int64_t serialNum_;
 };
 
