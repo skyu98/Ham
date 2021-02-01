@@ -2,6 +2,8 @@
 #define __EVENTLOOP_H__
 #include "base/Timestamp.h"
 #include "net/SocketOps.h"
+#include "net/Callbacks.h"
+#include "net/TimerId.h"
 
 #include <memory>
 #include <vector>
@@ -16,6 +18,7 @@ namespace net
 
 class Channel;
 class Epoller;
+class TimerQueue;
 
 class EventLoop : public boost::noncopyable
 {
@@ -39,6 +42,11 @@ public:
     void assertInLoopThread();
 
     void runInLoop(const Functor& func);
+
+    TimerId runAt(const Timestamp& time, const TimerCallback& cb);
+    TimerId runAfter(double delay, const TimerCallback& cb);
+    TimerId runEvery(double interval, const TimerCallback& cb);
+    void cancelTimer(TimerId);
 
 private:
     void wakeup();
