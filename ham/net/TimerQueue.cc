@@ -4,14 +4,66 @@
 #include "net/TimerId.h"
 #include "net/Channel.h"
 #include "base/Util.h"
+#include "base/Log.h"
+
+#include <sys/timerfd.h>
 namespace ham
 {
     namespace net
     {
         namespace detail
         {
-            int create_alarmFd();
-            void resetAlarmFd(int alarmFd, Timestamp when);
+            int create_alarmFd()
+            {
+                int alarmFd = ::timerfd_create(CLOCK_MONOTONIC,
+                                                TFD_NONBLOCK | TFD_CLOEXEC);
+                if(alarmFd < 0)
+                    CRITICAL("Failed in create_alarmFd");
+
+                return alarmFd;
+            }
+
+            // 计算超时时刻与当前时间的时间差
+            struct timespec howMuchTimeFromNow(Timestamp when)
+            {
+                int64_t microseconds = when.microsecondsFromEpoch()
+                                        - Timestamp::now().microsecondsFromEpoch();
+                if (microseconds < 100)
+                {
+                    microseconds = 100;
+                }
+                struct timespec ts;
+                ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicrosecondsPerSecond);
+                ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicrosecondsPerSecond) * 1000);
+                return ts;
+            }
+
+            // 处理超时事件，超时后alarmFd变为可读，howmany表示超时的次数
+            // 将事件读出来，避免陷入Loop忙碌状态
+            void readAlarmfd(int alarmFd, Timestamp now) {
+                uint64_t howmany;
+                ssize_t n = ::read(alarmFd, &howmany, sizeof(howmany));
+                TRACE("TimerQueue::handleRead {} at {}", howmany, now.toString());
+                if(n != sizeof(howmany)) {
+                    ERROR("TimerQueue::handleRead reads {} bytes instead of 8", n);
+                }   
+            }
+
+            void resetAlarmFd(int alarmFd, Timestamp expiration)
+            {
+                // wake up loop by timerfd_settime()
+                struct itimerspec newValue;
+                struct itimerspec oldValue;
+                bzero(&newValue, sizeof newValue);
+                bzero(&oldValue, sizeof oldValue);
+                newValue.it_value = howMuchTimeFromNow(expiration);
+                int ret = ::timerfd_settime(alarmFd, 0, &newValue, &oldValue);
+                if (ret)
+                {
+                    ERROR("timerfd_settime()");
+                }
+            }
+
         }
 
         TimerQueue::TimerQueue(EventLoop* loop)
@@ -46,7 +98,19 @@ namespace ham
         
         void TimerQueue::handleRead(Timestamp alarmTime) 
         {
-            
+            loop_->assertInLoopThread();
+            Timestamp now(Timestamp::now());
+            detail::readAlarmfd(alarmFd_, now);
+
+            std::vector<timeEntry> expired = getExpired(now);
+
+            cancelingTimers_.clear();
+            callingExpiredTimers_ = true;
+            for(const auto& entry : expired)
+            {
+                entry.second->run();
+            }
+            callingExpiredTimers_ = false;
         }
         
         void TimerQueue::addTimerInLoop(std::shared_ptr<Timer> timer) 
@@ -89,6 +153,11 @@ namespace ham
                 auto res = timerList_.insert(timeEntry(when, timer));
                 assert(res.second == true);
             }
+        }
+        
+        std::vector<TimerQueue::timeEntry> TimerQueue::getExpired(Timestamp now) 
+        {
+            
         }
     }
 }

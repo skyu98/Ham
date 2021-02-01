@@ -42,7 +42,7 @@ private:
     void addTimerInLoop(std::shared_ptr<Timer> timer);
     void cancelTimerInLoop(TimerId);
     void insert(std::shared_ptr<Timer> timer);
-    std::vector<timeEntry> getExpired();
+    std::vector<timeEntry> getExpired(Timestamp now);
 
     EventLoop* loop_;
     const int alarmFd_;
