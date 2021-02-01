@@ -66,6 +66,7 @@ private:
 
     std::unique_ptr<Epoller> epoller_;
     std::unique_ptr<Channel> wakeupChannel_;
+    std::unique_ptr<TimerQueue> timerQueue_;
     ChannelList activeChannels_;
     std::shared_ptr<Channel> currentActiveChannel_;
     std::vector<Functor> pendingFunctors_;

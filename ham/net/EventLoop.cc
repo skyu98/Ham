@@ -1,6 +1,7 @@
 #include "EventLoop.h"
 #include "net/Channel.h"
 #include "net/Epoller.h"
+#include "net/TimerQueue.h"
 #include "base/Log.h"
 #include "base/Util.h"
 #include "net/CurrentThread.h"
@@ -37,7 +38,8 @@ EventLoop::EventLoop()
       threadId_(static_cast<pid_t>(CurrentThread::tid())),
       wakeup_fd_(::createEventfd()),
       epoller_(util::make_unique<Epoller>(this)),
-      wakeupChannel_(util::make_unique<Channel>(this, wakeup_fd_))
+      wakeupChannel_(util::make_unique<Channel>(this, wakeup_fd_)),
+      timerQueue_(util::make_unique<TimerQueue>(this))
 {
     TRACE("EventLoop created {} ", fmt::ptr(this));
     if(t_loopInThisThread)
@@ -127,6 +129,28 @@ void EventLoop::runInLoop(const Functor& func)
     if(isInLoopThread())
         func();
     queueInLoop(func);
+}
+
+TimerId EventLoop::runAt(const Timestamp& time, const TimerCallback& cb) 
+{
+    return timerQueue_->addTimer(cb, time, 0);
+}
+
+TimerId EventLoop::runAfter(double delay, const TimerCallback& cb) 
+{
+    Timestamp when = addTime(Timestamp::now(), delay);
+    return runAt(when, cb);
+}
+
+TimerId EventLoop::runEvery(double interval, const TimerCallback& cb) 
+{
+    Timestamp when = addTime(Timestamp::now(), interval);
+    return timerQueue_->addTimer(cb, when, interval);
+}
+
+void EventLoop::cancelTimer(TimerId id) 
+{
+    timerQueue_->cancelTimer(id);
 }
 
 void EventLoop::queueInLoop(const Functor& pendingFunc) 
