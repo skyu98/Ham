@@ -1,4 +1,5 @@
 #include "net/EventLoop.h"
+#include "base/Log.h"
 #include "net/Channel.h"
 #include <sstream>
 
@@ -16,6 +17,12 @@ namespace ham
         {
             
         }
+
+        Channel::~Channel()
+        {
+            assert(!isHandlingEvent_);
+        }
+
         
         void Channel::update() 
         {

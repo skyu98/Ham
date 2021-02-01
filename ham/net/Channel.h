@@ -31,6 +31,8 @@ public:
 
 public:
     Channel(EventLoop* loop, int fd);
+    ~Channel();
+    
     int getFd() const{ return fd_;}
     int getEvent() const { return event_; }
     int getStatus() const { return status_; }

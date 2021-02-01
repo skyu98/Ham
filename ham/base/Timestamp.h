@@ -29,7 +29,7 @@ public:
     bool valid() const { return microsecondsFromEpoch_ > 0; }
 
     int64_t microsecondsFromEpoch() const { return microsecondsFromEpoch_; }
-    int64_t secondsFromEpoch() const { return microsecondsFromEpoch_; }
+    int64_t secondsFromEpoch() const { return microsecondsFromEpoch_ / kMicrosecondsPerSecond; }
     
     // 以下函数与this指针无关，所以是静态成员函数
     static Timestamp now(); 
@@ -62,7 +62,7 @@ inline Timestamp addTime(Timestamp src, double secondsToBeAdded)
 {
     int64_t microseconds = static_cast<int64_t>(secondsToBeAdded * 
                                                 Timestamp::kMicrosecondsPerSecond);
-    return Timestamp(microseconds);
+    return Timestamp(src.microsecondsFromEpoch() + microseconds);
 }
 
 }

@@ -30,7 +30,7 @@ namespace ham
 
             Timestamp now(Timestamp::now());
             if(numOfEvents > 0)
-            {
+            {          
                 TRACE("{} events has happened...", numOfEvents);
                 fillActiveChannels(numOfEvents, ActiveChannels);
                 if(numOfEvents == static_cast<int>(retEpoll_event_.size()))
@@ -112,10 +112,11 @@ namespace ham
         void Epoller::update(int op, Channel* channel) 
         {
             struct epoll_event tmp;
+            bzero(&tmp, sizeof(tmp));
             int fd = channel->getFd();
             
             tmp.data.ptr = static_cast<void*>(channel);
-            tmp.data.fd = fd, tmp.events = channel->getEvent();
+            tmp.events = channel->getEvent();
 
             TRACE("epoll_ctl op = {}, fd = {}, event = [{}]", 
                 operationToString(op), fd, channel->eventsToString());
@@ -130,22 +131,24 @@ namespace ham
                         operationToString(op), fd);
                 }
             }
+            // TRACE("ptr is {}", fmt::ptr(tmp.data.ptr));
+            // TRACE("channel is {}", fmt::ptr(channel));
         }
         
         void Epoller::fillActiveChannels(int numOfEvents, 
                                         std::vector<Channel*>& ActiveChannels) const
         {
             assert(static_cast<size_t>(numOfEvents) <= retEpoll_event_.size());
-            for(const auto event : retEpoll_event_)
+            for(int i = 0;i < numOfEvents;++i)   // do not use for(const auto& event : retEpoll_event_)
             {
-                Channel* channel = static_cast<Channel*>(event.data.ptr);
+                Channel* channel = static_cast<Channel*>(retEpoll_event_[i].data.ptr);
 #ifndef NDEBUG  //TODO: DO WE NEED THIS ?
                 int fd = channel->getFd();
                 auto it = channelMap_.find(fd);
                 assert(it != channelMap_.end());
                 assert(it->second == channel);
 #endif
-                channel->setRevent(event.events);  //TODO: DO WE NEED THIS ?
+                channel->setRevent(retEpoll_event_[i].events);  //TODO: DO WE NEED THIS ?
                 ActiveChannels.emplace_back(std::move(channel));
             }
         }
