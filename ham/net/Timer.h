@@ -20,7 +20,7 @@ public:
 
     Timestamp expiration() const  { return expiration_; }
     bool repeat() const { return repeat_; }
-    int64_t sequence() const { return serialNum_; }
+    int64_t serialNum() const { return serialNum_; }
 
     void restart(Timestamp now);
 
