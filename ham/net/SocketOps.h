@@ -45,6 +45,4 @@ struct sockaddr_in getLocalAddr(int sockfd);
 }
 }
 
-
-
 #endif // __SOCKETOPS_H__
