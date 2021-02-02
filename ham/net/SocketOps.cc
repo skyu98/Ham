@@ -24,7 +24,7 @@ void setNonBlockAndCloseOnExec(int sockfd) {
 #endif
 
 // Socket functions
-int sockets::createNonblockingOrDie(){
+int createNonblockingOrDie(){
 #if VALGRIND	
     int sockfd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sockfd < 0)
@@ -42,7 +42,7 @@ int sockets::createNonblockingOrDie(){
 	return sockfd;
 }
 
-void sockets::bindOrDie(int sockfd, const sockets::SA_in& address){
+void bindOrDie(int sockfd, const sockets::SA_in& address){
 	int ret = bind(sockfd, sockaddr_cast(&address),
                 static_cast<socklen_t>(sizeof(address)));
 	if(ret < 0)
@@ -51,7 +51,7 @@ void sockets::bindOrDie(int sockfd, const sockets::SA_in& address){
 	}
 };
 
-void sockets::listenOrDie(int fd)
+void listenOrDie(int fd)
 {
 	int ret = ::listen(fd, SOMAXCONN);
 	if(ret < 0)
@@ -110,7 +110,7 @@ int accept(int sockfd, SA_in& addrin)
     return connFd;
 }
 
-ssize_t sockets::read(int fd, void *buf, size_t nbyte){
+ssize_t read(int fd, void *buf, size_t nbyte){
 	ssize_t ret = 0;
 
 again:
@@ -129,7 +129,7 @@ again:
 	return ret;
 }
 
-ssize_t sockets::write(int fd, void *buf, size_t nbyte){
+ssize_t write(int fd, const void *buf, size_t nbyte){
 	ssize_t ret = 0;
 
 again:
@@ -148,13 +148,17 @@ again:
 	return ret;
 }
 
-void sockets::close(int sockfd) {
+ssize_t write(int fd, const std::string& msg){
+    return write(fd, msg.c_str(), msg.length());
+}
+
+void close(int sockfd) {
     if(::close(sockfd) < 0) {
         ERROR("sockets::close");
     }
 }
 
-void sockets::shutdownWrite(int sockfd) {
+void shutdownWrite(int sockfd) {
     if(::shutdown(sockfd, SHUT_WR) < 0) {
         ERROR("sockets::shutdownWrite");
     }
@@ -181,7 +185,7 @@ SA_in* sockaddr_in_cast(SA* addr)
     return static_cast<SA_in*>(implicit_cast<void*>(addr));
 }
 
-std::string sockets::toIpStr(const SA_in* addr) {
+std::string toIpStr(const SA_in* addr) {
     char buf[32];
     ::inet_ntop(AF_INET, &addr->sin_addr, buf, static_cast<socklen_t>(sizeof(buf)));
     return buf;
@@ -196,7 +200,7 @@ void ipPortToAddrin(const std::string& ip, uint16_t port, SA_in* addr)
     }
 }
 
-SA_in sockets::getLocalAddr(int sockfd) {
+SA_in getLocalAddr(int sockfd) {
     SA_in localaddr;
     bzero(&localaddr, sizeof(localaddr));
     socklen_t addrlen = static_cast<socklen_t>(sizeof(localaddr));

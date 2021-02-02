@@ -179,7 +179,7 @@ void EventLoop::queueInLoop(const Functor& pendingFunc)
 void EventLoop::wakeup() 
 {
     uint64_t one = 1;
-    ssize_t n = socket::write(wakeup_fd_, &one, sizeof(one));
+    ssize_t n = sockets::write(wakeup_fd_, &one, sizeof(one));
     if(n != sizeof(one))
     {
         ERROR("EventLoop::wakeup() writes {} bytes instead of 8", n);
@@ -189,7 +189,7 @@ void EventLoop::wakeup()
 void EventLoop::handleWakeupFd(Timestamp receiveTime) 
 {
     uint64_t one = 1;
-    ssize_t n = socket::read(wakeup_fd_, &one, sizeof(one));
+    ssize_t n = sockets::read(wakeup_fd_, &one, sizeof(one));
     if(n != sizeof(one)) {
         ERROR("EventLoop::handleRead reads {} bytes instead of 8 ", n);
     }   

@@ -29,6 +29,11 @@ namespace ham
             loop_->updateChannel(this);
         }
         
+        void Channel::remove() 
+        {
+            loop_->removeChannel(this); 
+        }
+        
         std::string Channel::eventsToString(int fd, int event) 
         {
             std::ostringstream oss;

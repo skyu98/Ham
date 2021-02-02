@@ -5,6 +5,9 @@ set(net_SRCS
   SocketOps.cc
   Timer.cc
   TimerQueue.cc
+  Acceptor.cc
+  Socket.cc
+  InetAddress.cc
   )
 
 add_library(ham_net ${net_SRCS})

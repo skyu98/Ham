@@ -17,13 +17,13 @@ class Acceptor
 {
 public:
     typedef std::function<void(int sockfd, const InetAddress&)> newConnCallback;
-    Acceptor(EventLoop* loop, const InetAddress& addr, bool);
+    Acceptor(EventLoop* loop, const InetAddress& addr, bool reusePort = true);
     ~Acceptor();
 
     void listen();
     bool isListening() const { return listening_; }
 
-    void setConnCallback(const newConnCallback& cb) { newConnCallback_ = cb;}
+    void setNewConnCallback(const newConnCallback& cb) { newConnCallback_ = cb;}
      
 private:
     void handleRead(Timestamp time);

@@ -21,11 +21,11 @@ public:
     int accept(InetAddress& peerAddr);
     void shutdownWrite();
 
-    const int getFd() const { return sockfd_; }
+    int getFd() const { return sockfd_; }
 
-    void Socket::setTcpNoDelay(bool on);
-    void Socket::setReuseAddr(bool on);
-    void Socket::setReusePort(bool on);
+    void setTcpNoDelay(bool on);
+    void setReuseAddr(bool on);
+    void setReusePort(bool on);
 
 private:
     const int sockfd_;

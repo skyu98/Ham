@@ -52,7 +52,7 @@ public:
     void disableWriting() { event_ &= ~kWriteEvent_; update(); }
     void disableAll() { event_ = kNoneEvent_; update(); }
     bool isNoneEvent() const { return event_ == kNoneEvent_; }
-    void remove() { loop_->removeChannel(this); }
+    void remove();
 
     void setRevent(uint32_t revent) { revent_ = revent; }
     void handleEvent(Timestamp retTime) { handleEventWithGuard(retTime); }
@@ -74,8 +74,6 @@ private:
     int revent_; 
     Channel::status status_;
     bool isHandlingEvent_;
-
-    
 
     static const int kReadEvent_ = EPOLLIN | EPOLLPRI;
     static const int kWriteEvent_ = EPOLLOUT;
