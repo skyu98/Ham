@@ -105,7 +105,7 @@ namespace ham
             assert(n == 1);
 
             if(status == Channel::status::kAdded)
-                update(EPOLL_CTL_MOD, channel);
+                update(EPOLL_CTL_DEL, channel);
             channel->setStatus(Channel::status::kNew);
         }
         

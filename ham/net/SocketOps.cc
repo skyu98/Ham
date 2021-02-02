@@ -1,4 +1,5 @@
-#include "SocketOps.h"
+#include "net/SocketOps.h"
+#include "net/Endian.h"
 #include "base/Log.h"
 #include "base/Types.h"
 
@@ -50,13 +51,63 @@ void sockets::bindOrDie(int sockfd, const sockets::SA_in& address){
 	}
 };
 
-void sockets::listenOrDie(int socket)
+void sockets::listenOrDie(int fd)
 {
-	int ret = ::listen(socket, SOMAXCONN);
+	int ret = ::listen(fd, SOMAXCONN);
 	if(ret < 0)
 	{
 		ERROR("sockets::listenOrDie error");
 	}
+}
+
+int accept(int sockfd, SA_in& addrin) 
+{
+    socklen_t addr_len = static_cast<socklen_t>(sizeof(addrin));
+#if VALGRIND || defined (NO_ACCEPT4)
+    int connFd = ::accept(sockfd, sockaddr_cast(&addrin), &addr_len);
+    setNonBlockAndCloseOnExec(connFd);
+#else
+    int connFd = ::accept4(sockfd, sockaddr_cast(&addrin),
+                            &addr_len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+#endif
+    if(connFd < 0)
+    {
+        int savedErrno = errno;
+        ERROR("socket::accept");
+        switch (savedErrno) 
+        {
+            case EAGAIN:
+            case ECONNABORTED:
+            case EINTR:
+            case EPROTO: // ???
+            case EPERM:
+            case EMFILE: // per-process lmit of open file desctiptor ???
+                // expected errors
+                {
+                    errno = savedErrno;
+                    break;
+                }
+            case EBADF:
+            case EFAULT:
+            case EINVAL:
+            case ENFILE:
+            case ENOBUFS:
+            case ENOMEM:
+            case ENOTSOCK:
+            case EOPNOTSUPP:
+                // unexpected errors
+                {
+                    CRITICAL("unexpected error of ::accept {}", savedErrno);
+                    break;
+                }
+            default:
+                {
+                    CRITICAL("unknown error of ::accept {}", savedErrno);
+                    break;
+                }
+        }
+    }
+    return connFd;
 }
 
 ssize_t sockets::read(int fd, void *buf, size_t nbyte){
@@ -97,6 +148,19 @@ again:
 	return ret;
 }
 
+void sockets::close(int sockfd) {
+    if(::close(sockfd) < 0) {
+        ERROR("sockets::close");
+    }
+}
+
+void sockets::shutdownWrite(int sockfd) {
+    if(::shutdown(sockfd, SHUT_WR) < 0) {
+        ERROR("sockets::shutdownWrite");
+    }
+}
+
+
 const SA* sockaddr_cast(const SA_in* addr) 
 {
     return static_cast<const SA*>(implicit_cast<const void*>(addr));
@@ -123,15 +187,12 @@ std::string sockets::toIpStr(const SA_in* addr) {
     return buf;
 }
 
-void sockets::close(int sockfd) {
-    if(::close(sockfd) < 0) {
-        ERROR("sockets::close");
-    }
-}
-
-void sockets::shutdownWrite(int sockfd) {
-    if(::shutdown(sockfd, SHUT_WR) < 0) {
-        ERROR("sockets::shutdownWrite");
+void ipPortToAddrin(const std::string& ip, uint16_t port, SA_in* addr) 
+{
+    addr->sin_family = AF_INET;
+    addr->sin_port = hostToNetwork16(port);
+    if(::inet_pton(AF_INET, ip.c_str(), &addr->sin_addr) <= 0) {
+        ERROR("sockets::ipPortToAddrin");
     }
 }
 
@@ -144,8 +205,6 @@ SA_in sockets::getLocalAddr(int sockfd) {
     }
     return localaddr;
 }
-
-
 
 }
 }
