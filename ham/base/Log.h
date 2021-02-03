@@ -14,6 +14,7 @@
 
 namespace ham
 {
+const char* strerror_tl(int savedErrno);
 
 class Logger final : public boost::noncopyable
 {

@@ -1,6 +1,15 @@
 #include "base/Log.h"
+#include <errno.h>
+
 namespace ham
 {
+    thread_local char t_errnobuf[512]; 
+    const char* strerror_tl(int savedErrno)
+    {
+        strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
+        return t_errnobuf;
+    }
+    
     Logger& Logger::Instance() 
     {
         static Logger logger_;

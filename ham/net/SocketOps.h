@@ -40,6 +40,7 @@ void shutdownWrite(int sockfd);
 void ipPortToAddrin(const std::string& ip, uint16_t port, SA_in* addr);
 std::string toIpStr(const SA_in* addr);
 SA_in getLocalAddr(int sockfd);
+int getSocketError(int sockfd);
 
 }
 }
