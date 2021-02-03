@@ -13,7 +13,8 @@ namespace ham
               event_(0),
               revent_(0),
               status_(status::kNew),
-              isHandlingEvent_(false)
+              isHandlingEvent_(false),
+              tied_(false)
         {
             
         }
@@ -32,6 +33,29 @@ namespace ham
         void Channel::remove() 
         {
             loop_->removeChannel(this); 
+        }
+        
+        void Channel::tie(const std::shared_ptr<void>& obj) 
+        {
+            tie_ = obj;
+            tied_ = true;
+        }
+        
+        void Channel::handleEvent(Timestamp retTime) 
+        {
+            std::shared_ptr<void> guard;
+            if(tied_)
+            {
+                guard = tie_.lock();
+                if(guard)
+                {
+                    handleEventWithGuard(retTime);
+                }
+            }
+            else
+            {
+                handleEventWithGuard(retTime);
+            }
         }
         
         std::string Channel::eventsToString(int fd, int event) 

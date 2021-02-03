@@ -37,7 +37,7 @@ public:
     int getEvent() const { return event_; }
     int getStatus() const { return status_; }
     void setStatus(Channel::status newStatus) { status_ = newStatus; }
-
+    void setRevent(uint32_t revent) { revent_ = revent; }
 
     /* set callbacks which is called when different revents come */
     void setReadCallback(const ReadEventCallback& cb) { readCb_ = cb; }
@@ -54,8 +54,8 @@ public:
     bool isNoneEvent() const { return event_ == kNoneEvent_; }
     void remove();
 
-    void setRevent(uint32_t revent) { revent_ = revent; }
-    void handleEvent(Timestamp retTime) { handleEventWithGuard(retTime); }
+    void tie(const std::shared_ptr<void>& obj);
+    void handleEvent(Timestamp retTime); 
 
     EventLoop* ownerLoop() const { return loop_; }
 
@@ -74,6 +74,9 @@ private:
     int revent_; 
     Channel::status status_;
     bool isHandlingEvent_;
+
+    std::weak_ptr<void> tie_;
+    bool tied_;
 
     static const int kReadEvent_ = EPOLLIN | EPOLLPRI;
     static const int kWriteEvent_ = EPOLLOUT;

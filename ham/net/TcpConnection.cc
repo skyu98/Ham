@@ -30,6 +30,22 @@ namespace ham
             DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, this, channel_->getFd());
         }
         
+        void TcpConnection::establishConnection() 
+        {
+            loop_->assertInLoopThread();
+            assert(state_ = State::kConnecting);
+            setState(State::kConnected);
+
+            channel_->tie(shared_from_this());
+            channel_->enableReading();
+            connectionCallback_(shared_from_this());
+        }
+        
+        void TcpConnection::destoryConnection() 
+        {
+            
+        }
+        
         void TcpConnection::handleRead(Timestamp receiveTime) 
         {
             

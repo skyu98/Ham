@@ -29,6 +29,9 @@ public:
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
     void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }
+
+    void establishConnection();
+    void destoryConnection();
 private:
     enum State
     {
@@ -39,6 +42,7 @@ private:
         num_state
     };
 
+    void setState(State state) { state_ = state;}
     void handleRead(Timestamp receiveTime);
     void handleClose();
     void handleError();
