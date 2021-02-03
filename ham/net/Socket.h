@@ -26,6 +26,7 @@ public:
     void setTcpNoDelay(bool on);
     void setReuseAddr(bool on);
     void setReusePort(bool on);
+    void setKeepAlive(bool on);
 
 private:
     const int sockfd_;

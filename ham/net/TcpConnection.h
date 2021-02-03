@@ -3,9 +3,11 @@
 #include <boost/noncopyable.hpp>
 #include <memory>   
 #include <string>
+#include <atomic>
 
 #include "net/InetAddress.h"
 #include "net/Callbacks.h"
+#include "base/Timestamp.h"
 
 namespace ham
 {
@@ -20,11 +22,13 @@ class TcpConnection : public boost::noncopyable,
                              std::enable_shared_from_this<TcpConnection>
 {
 public:
-    TcpConnection(EventLoop* loop, const std::string& name, 
+    TcpConnection(EventLoop* loop, const std::string& name, int sockfd,
                     InetAddress localAddr, InetAddress peerAddr);
     ~TcpConnection();
 
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
+    void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
+    void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }
 private:
     enum State
     {
@@ -35,9 +39,13 @@ private:
         num_state
     };
 
+    void handleRead(Timestamp receiveTime);
+    void handleClose();
+    void handleError();
+
     EventLoop* loop_;
     std::string name_;
-    State state_;
+    std::atomic<State> state_;
 
     InetAddress localAddr_;
     InetAddress peerAddr_;
@@ -46,7 +54,7 @@ private:
     std::shared_ptr<Channel> channel_;
 
     ConnectionCallback connectionCallback_;
-    MessageCallback messagrCallback_;
+    MessageCallback messageCallback_;
     CloseCallback closeCallback_;
 };
 

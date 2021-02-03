@@ -54,14 +54,20 @@ namespace ham
 
         void Socket::setTcpNoDelay(bool on) {
             int opt = on ? 1 : 0;
-            ::setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY, 
+            int ret = ::setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY, 
                 &opt, static_cast<socklen_t>(sizeof(opt)));
+            if(ret < 0 && on) {
+                ERROR("Socket::setTcpNoDelay failed.");
+            }
         }
 
         void Socket::setReuseAddr(bool on) {
             int opt = on ? 1 : 0;
-            ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR,
+            int ret = ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR,
                     &opt, static_cast<socklen_t>(sizeof(opt)));
+            if(ret < 0 && on) {
+                ERROR("Socket::setReuseAddr failed.");
+            }
         }
 
         void Socket::setReusePort(bool on) {
@@ -77,6 +83,16 @@ namespace ham
                 ERROR("SO_REUSEPORT is not supported.");
             }
         #endif 
+        }
+        
+        void Socket::setKeepAlive(bool on) 
+        {
+            int optval = on ? 1 : 0;
+            int ret = ::setsockopt(sockfd_, SOL_SOCKET, SO_KEEPALIVE,
+                            &optval, static_cast<socklen_t>(sizeof(optval)));
+            if(ret < 0 && on) {
+                ERROR("Socket::setKeepAlive failed.");
+            }
         }
     }
 }
