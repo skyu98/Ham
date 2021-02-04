@@ -26,6 +26,8 @@ public:
                     InetAddress localAddr, InetAddress peerAddr);
     ~TcpConnection();
 
+    const std::string getName() const { return name_; } 
+
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
     void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }

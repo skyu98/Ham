@@ -42,6 +42,7 @@ public:
     void assertInLoopThread();
 
     void runInLoop(const Functor& func);
+    void queueInLoop(const Functor& pendingfunc);
 
     TimerId runAt(const Timestamp& time, const TimerCallback& cb);
     TimerId runAfter(double delay, const TimerCallback& cb);
@@ -51,7 +52,6 @@ public:
 private:
     void wakeup();
     void handleWakeupFd(Timestamp receiveTime);
-    void queueInLoop(const Functor& pendingfunc);
     void doPendingFunctors();
 
     bool looping_;

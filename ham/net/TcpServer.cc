@@ -12,6 +12,7 @@ namespace ham
     {
         TcpServer::TcpServer(EventLoop* loop, const InetAddress& listenAddr, const std::string& name) 
             : loop_(loop),
+              started_(false),
               hostPost_(listenAddr.getIpPortStr()),
               name_(name),
               acceptor_(util::make_unique<Acceptor>(loop, listenAddr)),
@@ -24,22 +25,48 @@ namespace ham
         
         TcpServer::~TcpServer() 
         {
-            
+            for(const auto& conn : connections_)
+            {
+                conn.second->destoryConnection();
+            }
         }
         
         void TcpServer::start() 
         {
-            
+            if(!started_)
+            {
+                started_ = true;
+            }
+
+            if(!acceptor_->isListening())
+            {
+                loop_->queueInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
+            }
         }
         
         void TcpServer::newConnectionCallback(int connfd, const InetAddress& peerAddr) 
         {
             loop_->assertInLoopThread();
-            std::string name = hostPost_ + std::to_string(nextConnId_);
+            std::string name = hostPost_ + std::to_string(nextConnId_++);
             InetAddress localAddr (sockets::getLocalAddr(connfd));
 
             TcpConnectionPtr newTcpConn = std::make_shared<TcpConnection>(
                                             loop_, name, connfd, localAddr);
+
+            connections_[name] = newTcpConn;
+            newTcpConn->setConnectionCallback(connectionCallback_);
+            newTcpConn->setMessageCallback(messageCallback_);
+            newTcpConn->setCloseCallback(std::bind(&TcpServer::removeConnection,
+                                                    this, std::placeholders::_1));
+            newTcpConn->establishConnection();
+        }
+        
+        void TcpServer::removeConnection(const TcpConnectionPtr& conn) 
+        {
+            loop_->assertInLoopThread();
+            connections_.erase(conn->getName());
+
+            loop_->queueInLoop(std::bind(&TcpConnection::destoryConnection, conn));
         }
     }
 }

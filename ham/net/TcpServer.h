@@ -25,12 +25,17 @@ public:
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
 
+    const std::string getName() const { return name_; }
+    const std::string getHostPost() const { return hostPost_; } 
+
 private:
     void newConnectionCallback(int connfd, const InetAddress& peerAddr);
+    void removeConnection(const TcpConnectionPtr& conn);
 
     typedef std::map<std::string, TcpConnectionPtr> connectionMap;
 
     EventLoop* loop_;
+    bool started_;
     std::unique_ptr<Acceptor> acceptor_;
     connectionMap connections_;
 
