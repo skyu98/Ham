@@ -40,7 +40,7 @@ namespace ham
 
             if(!acceptor_->isListening())
             {
-                loop_->queueInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
+                loop_->runInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
             }
         }
         
