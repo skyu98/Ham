@@ -45,7 +45,16 @@ namespace ham
         
         void TcpConnection::destoryConnection() 
         {
-            
+            loop_->assertInLoopThread();
+            // 如果是TcpServer主动关闭连接，则不会经过handleClose，需要设置状态
+            if (state_ == kConnected)
+            {
+                setState(kDisconnected);
+                channel_->disableAll();
+
+                connectionCallback_(shared_from_this());
+            }
+            channel_->remove();
         }
         
         void TcpConnection::handleRead(Timestamp receiveTime) 
@@ -73,7 +82,11 @@ namespace ham
         
         void TcpConnection::handleClose() 
         {
-            
+            loop_->assertInLoopThread();
+            setState(State::kDisconnected);
+            channel_->disableAll();
+
+            closeCallback_(shared_from_this());
         }
         
         void TcpConnection::handleError() 
