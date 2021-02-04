@@ -3,6 +3,7 @@
 #include "net/EventLoop.h"
 #include "net/Channel.h"
 #include "base/Log.h"
+#include "base/Util.h"
 #include <functional>
 
 namespace ham
@@ -16,8 +17,8 @@ namespace ham
               state_(State::kConnecting),
               localAddr_(localAddr_),
               peerAddr_(peerAddr),
-              socket_(std::make_shared<Socket>(sockfd)),
-              channel_(std::make_shared<Channel>(loop, sockfd))
+              socket_(util::make_unique<Socket>(sockfd)),
+              channel_(util::make_unique<Channel>(loop, sockfd))
         {
             channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this,
                                     std::placeholders::_1));

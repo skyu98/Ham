@@ -54,8 +54,8 @@ private:
     InetAddress localAddr_;
     InetAddress peerAddr_;
 
-    std::shared_ptr<Socket> socket_;
-    std::shared_ptr<Channel> channel_;
+    std::unique_ptr<Socket> socket_;
+    std::unique_ptr<Channel> channel_;
 
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
