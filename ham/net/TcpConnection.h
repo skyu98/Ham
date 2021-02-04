@@ -18,8 +18,8 @@ class EventLoop;
 class Channel;
 class Socket;
 
-class TcpConnection : public boost::noncopyable,
-                             std::enable_shared_from_this<TcpConnection>
+class TcpConnection :   boost::noncopyable,
+                        public std::enable_shared_from_this<TcpConnection>
 {
 public:
     TcpConnection(EventLoop* loop, const std::string& name, int sockfd,
@@ -27,6 +27,10 @@ public:
     ~TcpConnection();
 
     const std::string getName() const { return name_; } 
+    const InetAddress& localAddress() { return localAddr_; }
+    const InetAddress& peerAddress() { return peerAddr_; }
+
+    bool isConnected() const { return state_ == State::kConnected; }
 
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }

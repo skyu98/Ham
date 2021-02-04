@@ -13,10 +13,10 @@ namespace ham
         TcpServer::TcpServer(EventLoop* loop, const InetAddress& listenAddr, const std::string& name) 
             : loop_(loop),
               started_(false),
-              hostPost_(listenAddr.getIpPortStr()),
               name_(name),
-              acceptor_(util::make_unique<Acceptor>(loop, listenAddr)),
-              nextConnId_(1)
+              hostPost_(listenAddr.getIpPortStr()),
+              nextConnId_(1),
+              acceptor_(util::make_unique<Acceptor>(loop, listenAddr))
         {
             acceptor_->setNewConnCallback(
                 std::bind(&TcpServer::newConnectionCallback, this, 
@@ -51,7 +51,7 @@ namespace ham
             InetAddress localAddr (sockets::getLocalAddr(connfd));
 
             TcpConnectionPtr newTcpConn = std::make_shared<TcpConnection>(
-                                            loop_, name, connfd, localAddr);
+                                            loop_, name, connfd, localAddr, peerAddr);
 
             connections_[name] = newTcpConn;
             newTcpConn->setConnectionCallback(connectionCallback_);

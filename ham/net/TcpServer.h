@@ -36,14 +36,14 @@ private:
 
     EventLoop* loop_;
     bool started_;
+    const std::string name_;
+    const std::string hostPost_;
+    int nextConnId_;
+
     std::unique_ptr<Acceptor> acceptor_;
     connectionMap connections_;
 
-    const std::string name_;
-    const std::string hostPost_;
-
-    int nextConnId_;
-
+    
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
 };

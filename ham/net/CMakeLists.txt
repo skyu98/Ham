@@ -8,6 +8,8 @@ set(net_SRCS
   Acceptor.cc
   Socket.cc
   InetAddress.cc
+  TcpServer.cc
+  TcpConnection.cc
   )
 
 add_library(ham_net ${net_SRCS})

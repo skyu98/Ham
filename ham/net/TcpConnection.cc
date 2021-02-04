@@ -15,7 +15,7 @@ namespace ham
             : loop_(loop),
               name_(name),
               state_(State::kConnecting),
-              localAddr_(localAddr_),
+              localAddr_(localAddr),
               peerAddr_(peerAddr),
               socket_(util::make_unique<Socket>(sockfd)),
               channel_(util::make_unique<Channel>(loop, sockfd))
@@ -24,13 +24,13 @@ namespace ham
                                     std::placeholders::_1));
             channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
             channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
-            DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, this, sockfd);
+            DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, fmt::ptr(this), sockfd);
             socket_->setKeepAlive(true);
         }
         
         TcpConnection::~TcpConnection() 
         {
-            DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, this, channel_->getFd());
+            DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, fmt::ptr(this), channel_->getFd());
         }
         
         void TcpConnection::establishConnection() 

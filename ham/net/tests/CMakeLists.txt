@@ -6,3 +6,6 @@ target_link_libraries(TimerQueue_unittest  ham_net ham_base)
 
 add_executable(Acceptor_unittest Acceptor_unittest.cc)
 target_link_libraries(Acceptor_unittest  ham_net ham_base)
+
+add_executable(TcpServer_unittest TcpServer_unittest.cc)
+target_link_libraries(TcpServer_unittest  ham_net ham_base)
