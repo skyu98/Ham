@@ -10,6 +10,7 @@ set(net_SRCS
   InetAddress.cc
   TcpServer.cc
   TcpConnection.cc
+  EventLoopThread.cc
   )
 
 add_library(ham_net ${net_SRCS})

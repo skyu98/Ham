@@ -9,3 +9,6 @@ target_link_libraries(Acceptor_unittest  ham_net ham_base)
 
 add_executable(TcpServer_unittest TcpServer_unittest.cc)
 target_link_libraries(TcpServer_unittest  ham_net ham_base)
+
+add_executable(EventLoopThread_test EventLoopThread_test.cc)
+target_link_libraries(EventLoopThread_test ham_net ham_base)

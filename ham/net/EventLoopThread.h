@@ -4,7 +4,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-#include <memory>
 #include <boost/noncopyable.hpp>
 namespace ham
 {
@@ -14,20 +13,21 @@ class EventLoop;
 
 class EventLoopThread : public boost::noncopyable
 {
-    typedef std::function<void(std::shared_ptr<EventLoop>)> ThreadInitCallback;
+    typedef std::function<void(EventLoop*)> ThreadInitCallback;
 public:
-    EventLoopThread(const ThreadInitCallback& cb);
+    EventLoopThread(const ThreadInitCallback& cb = ThreadInitCallback());
     ~EventLoopThread();
 
-    std::shared_ptr<EventLoop> getLoop() const { return loop_; }
+    EventLoop* startLoop();
 
 private:
     /* data */
     void threadFunc();
 
+    EventLoop* loop_;
     bool exiting_;
     ThreadInitCallback initCallback_;
-    std::shared_ptr<EventLoop> loop_;
+
     std::thread thread_;
     std::mutex mutex_;
     std::condition_variable cond_;
