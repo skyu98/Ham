@@ -48,6 +48,8 @@ namespace ham
                 started_ = true;
             }
 
+            loopThreadPool_->start(threadInitCallback_);
+
             if(!acceptor_->isListening())
             {
                 loop_->runInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
