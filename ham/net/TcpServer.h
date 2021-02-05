@@ -36,6 +36,7 @@ public:
 private:
     void newConnectionCallback(int connfd, const InetAddress& peerAddr);
     void removeConnection(const TcpConnectionPtr& conn);
+    void removeConnectionInLoop(const TcpConnectionPtr& conn);
 
     typedef std::map<std::string, TcpConnectionPtr> connectionMap;
 

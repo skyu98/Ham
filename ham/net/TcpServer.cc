@@ -71,15 +71,23 @@ namespace ham
             newTcpConn->setMessageCallback(messageCallback_);
             newTcpConn->setCloseCallback(std::bind(&TcpServer::removeConnection,
                                                     this, std::placeholders::_1));
+            // 此处将conn交给nextIoLoop来负责，而不是baseLoop
             nextIoLoop->runInLoop(std::bind(&TcpConnection::establishConnection, newTcpConn));
         }
         
         void TcpServer::removeConnection(const TcpConnectionPtr& conn) 
         {
+            loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, conn));
+        }
+        
+        void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn) 
+        {
             loop_->assertInLoopThread();
             connections_.erase(conn->getName());
 
-            loop_->queueInLoop(std::bind(&TcpConnection::destoryConnection, conn));
+            // 此处必须由conn所属loop去完成删除工作
+            EventLoop* ioLoop = conn->getOwnnerLoop();
+            ioLoop->queueInLoop(std::bind(&TcpConnection::destoryConnection, conn));
         }
     }
 }

@@ -27,6 +27,7 @@ public:
     ~TcpConnection();
 
     const std::string getName() const { return name_; } 
+    EventLoop* getOwnnerLoop() const { return loop_; }
     const InetAddress& localAddress() { return localAddr_; }
     const InetAddress& peerAddress() { return peerAddr_; }
 
