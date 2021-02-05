@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <functional>
 #include <boost/noncopyable.hpp>
 #include "net/Callbacks.h"
 namespace ham
@@ -13,17 +14,21 @@ class EventLoop;
 class Acceptor;
 class TcpConnection;
 class InetAddress;
+class EventLoopThreadPool;
 
 class TcpServer : public boost::noncopyable
 {
+    typedef std::function<void(EventLoop*)> ThreadInitCallback;
 public:
     TcpServer(EventLoop*, const InetAddress&, const std::string& name);
     ~TcpServer();
-
+    
+    void setNumOfThreads(int numOfThreads);
     void start();
 
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
+    void setThreadInitCallback(const ThreadInitCallback& cb) { threadInitCallback_ = cb; }
 
     const std::string getName() const { return name_; }
     const std::string getHostPost() const { return hostPost_; } 
@@ -41,11 +46,13 @@ private:
     int nextConnId_;
 
     std::unique_ptr<Acceptor> acceptor_;
+    std::unique_ptr<EventLoopThreadPool> loopThreadPool_;
     connectionMap connections_;
 
     
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
+    ThreadInitCallback threadInitCallback_;
 };
 
 

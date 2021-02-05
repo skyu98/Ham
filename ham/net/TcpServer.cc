@@ -5,7 +5,9 @@
 #include "net/SocketOps.h"
 #include "base/Util.h"
 #include "net/Acceptor.h"
-#include <functional>
+#include "net/EventLoopThreadPool.h"
+#include <assert.h>
+
 namespace ham
 {
     namespace net
@@ -16,8 +18,10 @@ namespace ham
               name_(name),
               hostPost_(listenAddr.getIpPortStr()),
               nextConnId_(1),
-              acceptor_(util::make_unique<Acceptor>(loop, listenAddr))
+              acceptor_(util::make_unique<Acceptor>(loop, listenAddr)),
+              loopThreadPool_(util::make_unique<EventLoopThreadPool>(loop))
         {
+            assert(loop);
             acceptor_->setNewConnCallback(
                 std::bind(&TcpServer::newConnectionCallback, this, 
                 std::placeholders::_1, std::placeholders::_2));
@@ -29,6 +33,12 @@ namespace ham
             {
                 conn.second->destoryConnection();
             }
+        }
+        
+        void TcpServer::setNumOfThreads(int numOfThreads) 
+        {
+            assert(numOfThreads >= 0);
+            loopThreadPool_->setNumOfThreads(numOfThreads);
         }
         
         void TcpServer::start() 
@@ -47,18 +57,19 @@ namespace ham
         void TcpServer::newConnectionCallback(int connfd, const InetAddress& peerAddr) 
         {
             loop_->assertInLoopThread();
+            EventLoop* nextIoLoop = loopThreadPool_->getNextLoop();
             std::string name = hostPost_ + std::to_string(nextConnId_++);
             InetAddress localAddr (sockets::getLocalAddr(connfd));
 
             TcpConnectionPtr newTcpConn = std::make_shared<TcpConnection>(
-                                            loop_, name, connfd, localAddr, peerAddr);
+                                            nextIoLoop, name, connfd, localAddr, peerAddr);
 
             connections_[name] = newTcpConn;
             newTcpConn->setConnectionCallback(connectionCallback_);
             newTcpConn->setMessageCallback(messageCallback_);
             newTcpConn->setCloseCallback(std::bind(&TcpServer::removeConnection,
                                                     this, std::placeholders::_1));
-            newTcpConn->establishConnection();
+            nextIoLoop->runInLoop(std::bind(&TcpConnection::establishConnection, newTcpConn));
         }
         
         void TcpServer::removeConnection(const TcpConnectionPtr& conn) 

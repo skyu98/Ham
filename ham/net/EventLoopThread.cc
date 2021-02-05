@@ -15,8 +15,11 @@ namespace ham
         EventLoopThread::~EventLoopThread() 
         {
             exiting_ = true;
-            loop_->quit();
-            thread_.join();
+            if(loop_)
+            {
+                loop_->quit();
+                thread_.join();
+            }
         }
         
         EventLoop* EventLoopThread::startLoop() 
