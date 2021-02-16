@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include <string>
+#include <sys/uio.h>
 
 namespace ham
 {
@@ -32,6 +33,7 @@ void listenOrDie(int socket);
 int accept(int sockfd, SA_in& addrin);
 
 ssize_t read(int fd, void *buf, size_t nbyte);
+ssize_t readv(int fd, const struct iovec*, int iocnt);
 ssize_t write(int fd, const void *buf, size_t nbyte);
 ssize_t write(int fd, const std::string& msg);
 

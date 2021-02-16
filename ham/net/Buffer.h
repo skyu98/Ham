@@ -13,8 +13,8 @@ class Buffer : public ham::copyable
 private:
     /* data */
     std::vector<char> buffer_;
-    size_t readIndex;
-    size_t writeIndex;
+    size_t readIndex_;
+    size_t writeIndex_;
 public:
     static const  size_t kInitialSize = 1024;
     static const  size_t kCheapPrepend = 8;
@@ -27,12 +27,12 @@ public:
     const char* findEOL() const;
     const char* findEOL(const char* start) const;
     
-    size_t readableBytes() const { return writeIndex - readIndex ;}
-    size_t writableBytes() const { return buffer_.size() - writeIndex; }
-    size_t prependableBytes() const { return readIndex; }
+    size_t readableBytes() const { return writeIndex_ - readIndex_ ;}
+    size_t writableBytes() const { return buffer_.size() - writeIndex_; }
+    size_t prependableBytes() const { return readIndex_; }
 
     // peek but not read the data away
-    const char* peek() const { return begin() + readIndex ;}
+    const char* peek() const { return begin() + readIndex_ ;}
     int8_t peekInt8() const;
     int16_t peekInt16() const;
     int32_t peekInt32() const;
@@ -43,7 +43,7 @@ public:
     int32_t readInt32();
     int32_t readInt64();
 
-    // move the readIndex (after read)
+    // move the readIndex_ (after read)
     void retrieve(size_t len);
     void retrieveInt8() { retrieve(sizeof(int8_t)); }
     void retrieveInt16() { retrieve(sizeof(int16_t)); }
@@ -55,13 +55,15 @@ public:
     std::string retrieveAllAsString();
 
     void ensureWritableBytes(size_t len);
-    char* beginWrite() { return begin() + writeIndex; }
-    const char* beginWrite() const { return begin() + writeIndex; }
-    void hasWritten(size_t len) { writeIndex += len; }
+    char* beginWrite() { return begin() + writeIndex_; }
+    const char* beginWrite() const { return begin() + writeIndex_; }
+    void hasWritten(size_t len) { writeIndex_ += len; }
 
     void append(const char* data, size_t len);
     void append(const std::string& str);
+    void prepend(const void* data, size_t len);
 
+    ssize_t readFd(int fd, int* savedErrno);
 private:
     // 注意到这里，典型的const重载
     char* begin() { return &(*buffer_.begin()); }

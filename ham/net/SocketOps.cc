@@ -129,6 +129,11 @@ again:
 	return ret;
 }
 
+ssize_t readv(int fd, const struct iovec* vec, int iocnt) 
+{
+    return ::readv(fd, vec, iocnt);
+}
+
 ssize_t write(int fd, const void *buf, size_t nbyte){
 	ssize_t ret = 0;
 
