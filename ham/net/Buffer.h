@@ -21,6 +21,11 @@ public:
     static const char kCRLF[];
     Buffer();
     void swap(Buffer& rhs);
+
+    const char* findCRLF() const;
+    const char* findCRLF(const char* start) const;
+    const char* findEOL() const;
+    const char* findEOL(const char* start) const;
     
     size_t readableBytes() const { return writeIndex - readIndex ;}
     size_t writableBytes() const { return buffer_.size() - writeIndex; }
@@ -44,11 +49,16 @@ public:
     void retrieveInt16() { retrieve(sizeof(int16_t)); }
     void retrieveInt32() { retrieve(sizeof(int32_t)); }
     void retrieveInt64() { retrieve(sizeof(int64_t)); }
+    void retrieveAll();
+    void retrieveUtil(const char* end);
+    std::string retrieveAsString(size_t len);
+    std::string retrieveAllAsString();
 
     void ensureWritableBytes(size_t len);
     char* beginWrite() { return begin() + writeIndex; }
     const char* beginWrite() const { return begin() + writeIndex; }
     void hasWritten(size_t len) { writeIndex += len; }
+
     void append(const char* data, size_t len);
     void append(const std::string& str);
 

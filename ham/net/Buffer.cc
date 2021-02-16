@@ -2,6 +2,7 @@
 #include "net/Endian.h"
 #include <assert.h>
 #include <cstring>
+#include <algorithm>
 
 namespace ham
 {
@@ -24,6 +25,32 @@ namespace ham
             std::swap(buffer_, rhs.buffer_);
             std::swap(readIndex, rhs.readIndex);
             std::swap(writeIndex, rhs.writeIndex);
+        }
+        
+        const char* Buffer::findCRLF() const
+        {
+            return findCRLF(peek());
+        }
+        
+        const char* Buffer::findCRLF(const char* start) const
+        {
+            assert(peek() <= start);
+            assert(start <= beginWrite());
+            const char* crlf = std::search(start, beginWrite(), kCRLF, kCRLF + 2);
+            return crlf == beginWrite() ? nullptr : crlf;
+        }
+        
+        const char* Buffer::findEOL() const
+        {
+            return findEOL(peek());
+        }
+        
+        const char* Buffer::findEOL(const char* start) const
+        {
+            assert(peek() <= start);
+            assert(start <= beginWrite());
+            const void* eol = ::memchr(start, '\n', beginWrite() - start);
+            return static_cast<const char*>(eol);
         }
         
         int8_t Buffer::peekInt8() const
@@ -85,6 +112,42 @@ namespace ham
             return res;
         }
         
+        void Buffer::retrieveAll() 
+        {
+            // 全部读完，read和write都回到起点
+            readIndex = kCheapPrepend; 
+            writeIndex = kCheapPrepend; 
+        }
+        
+        void Buffer::retrieveUtil(const char* end) 
+        {
+            assert(peek() <= end);
+            assert(end <= beginWrite());
+            retrieve(end - peek());
+        }
+        
+        std::string Buffer::retrieveAsString(size_t len) 
+        {
+            assert(len <= readableBytes());
+            std::string res(peek(), len);
+            retrieve(len);
+            return res;
+        }
+        
+        std::string Buffer::retrieveAllAsString() 
+        {
+            return retrieveAsString(readableBytes());
+        }
+        
+        void Buffer::ensureWritableBytes(size_t len) 
+        {
+            if(writableBytes() < len)
+            {
+                makeSpace(len);
+            }
+            assert(writableBytes() >= len);
+        }
+        
         void Buffer::append(const char* data, size_t len) 
         {
             ensureWritableBytes(len);
@@ -95,6 +158,27 @@ namespace ham
         void Buffer::append(const std::string& str) 
         {
             append(str.data(), str.size());
+        }
+        
+        void Buffer::makeSpace(size_t len) 
+        {
+            // 前面的空白加上也写不下
+            if(writableBytes() + prependableBytes() < len + kCheapPrepend)
+            {
+                buffer_.resize(writeIndex + len);
+            }
+            else
+            {   
+                // 前面有足够的空白
+                assert(kCheapPrepend < readIndex);
+                size_t readable = readableBytes();
+                std::copy(begin() + readIndex,
+                        begin() + writeIndex,
+                        begin() + kCheapPrepend);     
+                readIndex = kCheapPrepend;
+                writeIndex = readIndex + readable;  
+                assert(readable == readableBytes());
+            }
         }
     }
 }
