@@ -19,6 +19,7 @@ public:
     static const  size_t kInitialSize = 1024;
     static const  size_t kCheapPrepend = 8;
     static const char kCRLF[];
+    
     Buffer();
     void swap(Buffer& rhs);
 

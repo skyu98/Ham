@@ -6,6 +6,7 @@
 #include <atomic>
 
 #include "net/InetAddress.h"
+#include "net/Buffer.h"
 #include "net/Callbacks.h"
 #include "base/Timestamp.h"
 
@@ -39,6 +40,12 @@ public:
 
     void establishConnection();
     void destoryConnection();
+
+    void send(const std::string& msg);
+    void send(Buffer& buffer);
+
+    void shutdown();
+
 private:
     enum State
     {
@@ -54,6 +61,10 @@ private:
     void handleClose();
     void handleError();
 
+    void sendInLoop(const std::string& msg);
+    void sendInLoop(const void* data, size_t len);
+    void shutdownInLoop();
+
     EventLoop* loop_;
     std::string name_;
     std::atomic<State> state_;
@@ -64,9 +75,13 @@ private:
     std::unique_ptr<Socket> socket_;
     std::unique_ptr<Channel> channel_;
 
+    Buffer inputBuffer_;
+    Buffer outputBuffer_;
+
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
     CloseCallback closeCallback_;
+    WriteCompeleteCallback writeCompeleteCallback_;
 };
 
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;

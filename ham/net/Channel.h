@@ -51,6 +51,8 @@ public:
     // disableReading() is not needed
     void disableWriting() { event_ &= ~kWriteEvent_; update(); }
     void disableAll() { event_ = kNoneEvent_; update(); }
+
+    bool isWriting() const { return event_ & kWriteEvent_; }
     bool isNoneEvent() const { return event_ == kNoneEvent_; }
     void remove();
 
