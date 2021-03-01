@@ -201,7 +201,7 @@ namespace ham
                     if(remaining == 0 && writeCompeleteCallback_)
                     {
                         loop_->queueInLoop(
-                            std::bind(&TcpConnection::writeCompeleteCallback_, 
+                            std::bind(TcpConnection::writeCompeleteCallback_, 
                             shared_from_this()));
                         // 此处如果是runInLoop，那么如果writeCompeleteCallback_有send操作，
                         // 就会一直递归
@@ -230,10 +230,10 @@ namespace ham
                     && highWaterMarkCallback_)
                     {
                         loop_->queueInLoop(
-                            std::bind(&TcpConnection::highWaterMarkCallback_,
+                            std::bind(TcpConnection::highWaterMarkCallback_,
                             shared_from_this(), old_len + remaining));
                     }
-                    outputBuffer_.append(static_cast<const char*>(data + n_wrote), remaining);
+                    outputBuffer_.append(static_cast<const char*>(data) + n_wrote, remaining);
                 }
 
                 // 关注可写事件，可写时将剩余数据发出
