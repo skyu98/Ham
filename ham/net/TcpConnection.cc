@@ -18,7 +18,8 @@ namespace ham
               localAddr_(localAddr),
               peerAddr_(peerAddr),
               socket_(util::make_unique<Socket>(sockfd)),
-              channel_(util::make_unique<Channel>(loop, sockfd))
+              channel_(util::make_unique<Channel>(loop, sockfd)),
+              highWaterMark_(64*1024*1024) // 64MiB
         {
             channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this,
                                     std::placeholders::_1));
@@ -129,6 +130,40 @@ namespace ham
             }
         }
         
+        void TcpConnection::handleWrite() 
+        {
+            loop_->assertInLoopThread();
+            // 此时按理说应该是在关注可读事件
+            if(channel_->isWriting())
+            {
+                ssize_t n_wrote = sockets::write(channel_->getFd(),
+                                                outputBuffer_.peek(),
+                                                outputBuffer_.readableBytes());
+                if(n_wrote > 0)
+                {
+                    outputBuffer_.retrieve(n_wrote);
+                    if(outputBuffer_.readableBytes() == 0)// 数据全部写完
+                    {
+                        channel_->disableWriting();  // 立即取消关注可写，否则busy loop
+                        if(writeCompeleteCallback_)
+                        {
+                            loop_->queueInLoop(
+                                std::bind(&TcpConnection::writeCompeleteCallback_, 
+                                shared_from_this()));
+                        }
+                    }
+                }
+                else
+                {
+                    ERROR("TcpConnection::handleWrite() Error.");
+                }
+            }
+            else // 没有关注EPOLLOUT事件
+            {  
+            TRACE("Connection fd = {} is down, no more writing", channel_->getFd());
+            }
+        }
+        
         void TcpConnection::handleClose() 
         {
             loop_->assertInLoopThread();
@@ -152,13 +187,14 @@ namespace ham
         void TcpConnection::sendInLoop(const void* data, size_t len) 
         {
             loop_->assertInLoopThread();
-            ssize_t remaining = len; // 剩余的数据长度
+            size_t remaining = len; // 剩余的数据长度
+            ssize_t n_wrote = 0;
             bool faultError = false;
 
             // 当outputBuf当中没数据（此时肯定也没关注可写事件），直接write
             if(!channel_->isWriting() && outputBuffer_.readableBytes() == 0)
             {
-                ssize_t n_wrote = sockets::write(channel_->getFd(), data, len);
+                n_wrote = sockets::write(channel_->getFd(), data, len);
                 if(n_wrote >= 0)
                 {
                     remaining -= n_wrote;
@@ -188,7 +224,22 @@ namespace ham
                 // 如果还没写完且没有错误发生（即发送缓冲区满），剩下的数据需要写到outputBuf
                 if(!faultError && remaining > 0)
                 {
-                    
+                    size_t old_len = outputBuffer_.readableBytes();
+                    if(old_len < highWaterMark_ 
+                    && old_len + remaining >= highWaterMark_
+                    && highWaterMarkCallback_)
+                    {
+                        loop_->queueInLoop(
+                            std::bind(&TcpConnection::highWaterMarkCallback_,
+                            shared_from_this(), old_len + remaining));
+                    }
+                    outputBuffer_.append(static_cast<const char*>(data + n_wrote), remaining);
+                }
+
+                // 关注可写事件，可写时将剩余数据发出
+                if(!channel_->isWriting())
+                {
+                    channel_->enableWriting();
                 }
             }
         }

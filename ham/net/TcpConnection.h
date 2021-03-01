@@ -37,6 +37,7 @@ public:
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
     void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }
+    void setHighWaterMarkCallback(const HighWaterMarkCallback& cb) { highWaterMarkCallback_ = cb; }
 
     void establishConnection();
     void destoryConnection();
@@ -79,10 +80,13 @@ private:
     Buffer inputBuffer_;
     Buffer outputBuffer_;
 
+    size_t highWaterMark_;
+
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
     CloseCallback closeCallback_;
     WriteCompeleteCallback writeCompeleteCallback_;
+    HighWaterMarkCallback highWaterMarkCallback_;
 };
 
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
