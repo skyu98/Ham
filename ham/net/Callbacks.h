@@ -18,7 +18,7 @@ namespace net
     typedef std::function<void (const TcpConnectionPtr&)> ConnectionCallback;
     typedef std::function<void (const TcpConnectionPtr&)> CloseCallback;
     typedef std::function<void (const TcpConnectionPtr&,
-                                Buffer*,Timestamp)> MessageCallback;
+                                Buffer&,Timestamp)> MessageCallback;
     typedef std::function<void (const TcpConnectionPtr&)> WriteCompeleteCallback;
     typedef std::function<void (const TcpConnectionPtr&, size_t)> HighWaterMarkCallback;
     // typedef std::function<void (const TcpConnectionPtr&,

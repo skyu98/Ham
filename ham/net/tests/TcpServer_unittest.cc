@@ -22,10 +22,12 @@ void connectionCallback(const TcpConnectionPtr& conn)
 }
 
 void msgCallback(const TcpConnectionPtr& conn, 
-                const char* data, ssize_t len)
+                Buffer& buf, Timestamp receiveTime)
 {
-    std::cout << "New message from " << conn->getName()
-             << " and its len is " <<  len << std::endl;
+    std::string msg(buf.retrieveAllAsString());
+    std::cout << "New message from " << conn->getName() << std::endl
+            << "it says:" << msg << std::endl
+            << " and its len is " << msg.size() << std::endl;
 }                                
 
 int main()

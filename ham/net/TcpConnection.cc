@@ -116,7 +116,7 @@ namespace ham
             ssize_t n = inputBuffer_.readFd(channel_->getFd(), &savedErrno);
             if (n > 0)
             {
-                messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
+                messageCallback_(shared_from_this(), inputBuffer_, receiveTime);
             }
             else if (n == 0)
             {
