@@ -42,7 +42,7 @@ public:
     int8_t readInt8();
     int16_t readInt16();
     int32_t readInt32();
-    int32_t readInt64();
+    int64_t readInt64();
 
     // move the readIndex_ (after read)
     void retrieve(size_t len);

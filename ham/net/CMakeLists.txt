@@ -8,6 +8,7 @@ set(net_SRCS
   Acceptor.cc
   Socket.cc
   InetAddress.cc
+  Buffer.cc
   TcpServer.cc
   TcpConnection.cc
   EventLoopThread.cc

@@ -3,6 +3,7 @@
 #include "net/InetAddress.h"
 #include "net/TcpConnection.h"
 #include "base/Log.h"
+#include "net/Buffer.h"
 #include <iostream>
 
 using namespace ham;

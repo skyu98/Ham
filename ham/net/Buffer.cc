@@ -108,11 +108,24 @@ namespace ham
             return res;
         }
         
-        int32_t Buffer::readInt64() 
+        int64_t Buffer::readInt64() 
         {
             int64_t res = peekInt64();
             retrieveInt64();
             return res;
+        }
+        
+        void Buffer::retrieve(size_t len) 
+        {
+            assert(len <= readableBytes());
+            if(len < readableBytes()) 
+            {
+                readIndex_ += len;
+            }
+            else
+            {
+                retrieveAll();
+            }
         }
         
         void Buffer::retrieveAll() 
