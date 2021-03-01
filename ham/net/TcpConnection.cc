@@ -22,6 +22,7 @@ namespace ham
         {
             channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this,
                                     std::placeholders::_1));
+            channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
             channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
             channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
             DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, fmt::ptr(this), sockfd);
@@ -151,7 +152,45 @@ namespace ham
         void TcpConnection::sendInLoop(const void* data, size_t len) 
         {
             loop_->assertInLoopThread();
-            ssize_t n = sockets::write(channel_->getFd(), data, len);
+            ssize_t remaining = len; // 剩余的数据长度
+            bool faultError = false;
+
+            // 当outputBuf当中没数据（此时肯定也没关注可写事件），直接write
+            if(!channel_->isWriting() && outputBuffer_.readableBytes() == 0)
+            {
+                ssize_t n_wrote = sockets::write(channel_->getFd(), data, len);
+                if(n_wrote >= 0)
+                {
+                    remaining -= n_wrote;
+                    if(remaining == 0 && writeCompeleteCallback_)
+                    {
+                        loop_->queueInLoop(
+                            std::bind(&TcpConnection::writeCompeleteCallback_, 
+                            shared_from_this()));
+                        // 此处如果是runInLoop，那么如果writeCompeleteCallback_有send操作，
+                        // 就会一直递归
+                    }
+                }
+                else // n_wrote < 0
+                {
+                    n_wrote = 0; // 实际发送大小为0
+                    if(errno != EWOULDBLOCK) // 不是因为发送缓存区满了
+                    {
+                        ERROR("TcpConnection::sendInLoop() Error");
+                        if (errno == EPIPE || errno == ECONNRESET)// FIXME: any others? 
+                        {
+                            faultError = true;
+                        }
+                    }
+                }
+
+                assert(remaining <= len);
+                // 如果还没写完且没有错误发生（即发送缓冲区满），剩下的数据需要写到outputBuf
+                if(!faultError && remaining > 0)
+                {
+                    
+                }
+            }
         }
         
         void TcpConnection::shutdownInLoop() 

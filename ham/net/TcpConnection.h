@@ -58,6 +58,7 @@ private:
 
     void setState(State state) { state_ = state;}
     void handleRead(Timestamp receiveTime);
+    void handleWrite();
     void handleClose();
     void handleError();
 
