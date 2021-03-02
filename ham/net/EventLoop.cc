@@ -30,6 +30,14 @@ int createEventfd()
 }
 }
 
+/**
+ * SIGPIPE 
+ * SIGPIPE 默认行为是终止进程，如果对方断开连接而本地继续写入的话，会造成服务进程的意外退出
+ * 加入服务进程繁忙，没有及时处理对方断开连接的事件，就有可能出现在连接断开后继续发送数据的情况
+ * 
+ * 模拟 : nc localhost后立刻ctrl-c断开客户端，服务进程过几秒就会退出
+ * 在EventLoop.cc中 IgonoreSigPipe则解决问题
+ */
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 class IgnoreSigPipe {
 public:
