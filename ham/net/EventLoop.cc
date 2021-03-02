@@ -7,6 +7,7 @@
 #include "net/CurrentThread.h"
 #include <sys/eventfd.h>
 #include <thread>
+#include <signal.h>
 
 using namespace ham;
 using namespace ham::net;
