@@ -26,8 +26,8 @@ public:
                                     std::placeholders::_1));
         server_->setMessageCallback(std::bind(&TestServer::msgCallback, this, 
                                     std::placeholders::_1,      // conn
-                                    std::placeholders::_2,      // data
-                                    std::placeholders::_3));    // len
+                                    std::placeholders::_2,      // buf
+                                    std::placeholders::_3));    // time
     }
 
     void start()
@@ -55,7 +55,7 @@ private:
     }
 
     void msgCallback(const TcpConnectionPtr& conn, 
-                    Buffer buf, Timestamp receiveTime)
+                    Buffer& buf, Timestamp receiveTime)
     {
         std::string msg(buf.retrieveAllAsString());
         std::cout << "New message from " << conn->getName() << std::endl

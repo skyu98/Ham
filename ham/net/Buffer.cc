@@ -158,8 +158,6 @@ namespace ham
             // 全部读完，read和write都回到起点
             readIndex_ = kCheapPrepend; 
             writeIndex_ = kCheapPrepend; 
-            std::cout << "retrieveAll()!!! WriteIndex at " << writeIndex_ << std::endl;
-            std::cout << "retrieveAll()!!! ReadIndex at " << readIndex_ << std::endl;
         }
         
         void Buffer::retrieveUtil(const char* end) 
@@ -241,7 +239,7 @@ namespace ham
             vec[1].iov_base = extraBuf;
             vec[1].iov_len = sizeof(extraBuf);
 
-            std::cout << "before readFd()!!! WriteIndex at " << writeIndex_ << std::endl;
+            //std::cout << "before readFd()!!! WriteIndex at " << writeIndex_ << std::endl;
 
             // TODO : 为什么是这样比较？
             const int iovcnt = 2 ;// writableBytes() < sizeof(extraBuf) ? 2 : 1;
@@ -253,7 +251,7 @@ namespace ham
             else if(implicit_cast<size_t>(n) <= writable) 
             {
                 writeIndex_ += n;
-                std::cout << "readFd() over!!! WriteIndex at " << writeIndex_ << std::endl;
+                //std::cout << "readFd() over!!! WriteIndex at " << writeIndex_ << std::endl;
 
             } 
             else 
