@@ -14,6 +14,10 @@ public:
     ChargenServer(EventLoop* loop,
                 const InetAddress& listenAddr,
                 bool printOut = false);
+    void start()
+    {
+        server_.start();
+    }
 private:
     void onMessage(const TcpConnectionPtr&conn,
                 Buffer& buf,
