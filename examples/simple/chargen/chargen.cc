@@ -64,6 +64,7 @@ void ChargenServer::onConnection(const TcpConnectionPtr&conn)
 
 void ChargenServer::onWriteComplete(const TcpConnectionPtr& conn) 
 {
+    // INFO("writeCompelete callback()");
     transferred_ += message_.size();
     conn->send(message_);
 }
