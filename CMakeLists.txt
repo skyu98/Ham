@@ -77,8 +77,6 @@ include_directories(
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-
-
 include_directories(${GTEST_INCLUDE_DIRS})
 
 #link_directories(${PROJECT_BINARY_DIR}/lib)
