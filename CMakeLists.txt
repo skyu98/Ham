@@ -61,7 +61,7 @@ find_library(CARES_LIBRARY NAMES cares)
 find_path(MHD_INCLUDE_DIR microhttpd.h)
 find_library(MHD_LIBRARY NAMES microhttpd)
 find_library(BOOSTTEST_LIBRARY NAMES boost_unit_test_framework)
-find_library(GOOGLEGLOG_LIBRARY NAMES glog)
+find_package(GTest REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -70,6 +70,8 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(
     ${CMAKE_SOURCE_DIR}/ham  # find spdlog
 )
+
+include_directories(${GTEST_INCLUDE_DIRS})
 
 #link_directories(${PROJECT_BINARY_DIR}/lib)
 link_directories(/usr/local/lib)

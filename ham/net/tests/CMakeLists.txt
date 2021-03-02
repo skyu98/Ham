@@ -18,3 +18,4 @@ target_link_libraries(EventLoopThreadPool_unittest ham_net ham_base)
 
 add_executable(Buffer_unittest Buffer_unittest.cc)
 target_link_libraries(Buffer_unittest ham_net ham_base)
+add_test(NAME Buffer_unittest COMMAND Buffer_unittest)

@@ -16,7 +16,7 @@ set(net_SRCS
   )
 
 add_library(ham_net ${net_SRCS})
-target_link_libraries(ham_net pthread)
+target_link_libraries(ham_net pthread gtest)
 
 install(TARGETS ham_net DESTINATION lib)
 
