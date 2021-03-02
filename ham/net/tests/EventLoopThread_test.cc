@@ -1,7 +1,6 @@
 #include "net/EventLoopThread.h"
 #include "net/EventLoop.h"
 #include "net/CurrentThread.h"
-#include "base/Log.h"
 #include <chrono>
 #include <iostream>
 using namespace ham;
@@ -13,10 +12,6 @@ void runInThread() {
 }
 
 int main() {
-    if(!Logger::Instance().init("Logger", "./log.txt", Logger::logLevel::trace))
-    {
-        return -1;
-    }
     std::cout << "main() : pid = " << std::this_thread::get_id() 
         << " tid  = " << CurrentThread::tid() << std::endl;
     EventLoopThread loopThread;

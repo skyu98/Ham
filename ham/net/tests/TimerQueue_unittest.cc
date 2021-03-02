@@ -1,6 +1,5 @@
 #include "net/EventLoop.h"
 #include "net/CurrentThread.h"
-#include "base/Log.h"
 #include <thread>
 #include <chrono>
 
@@ -28,9 +27,6 @@ void cancel(TimerId timer, const std::string& name) {
 }
 
 int main() {
-    if (!Logger::Instance().init("log", "logs/test.txt", Logger::logLevel::trace)) {
-		return 1;
-	}
     printTid();
     std::this_thread::sleep_for(std::chrono::seconds(1));
     {

@@ -29,6 +29,14 @@ int createEventfd()
 }
 }
 
+class Log
+{
+    Log()
+    {
+        
+    }
+}
+
 EventLoop::EventLoop() 
     : looping_(false),
       quit_(false),

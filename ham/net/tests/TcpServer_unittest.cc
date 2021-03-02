@@ -2,7 +2,6 @@
 #include "net/EventLoop.h"
 #include "net/InetAddress.h"
 #include "net/TcpConnection.h"
-#include "base/Log.h"
 #include "net/Buffer.h"
 #include <iostream>
 
@@ -34,11 +33,6 @@ void msgCallback(const TcpConnectionPtr& conn,
 
 int main()
 {
-    if(!Logger::Instance().init("Logger", "./log.txt", Logger::logLevel::trace))
-    {
-        return -1;
-    }
-
     EventLoop loop;
     InetAddress listenAddr(8888);
     TcpServer server(&loop, listenAddr, "TcpServer");

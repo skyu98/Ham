@@ -1,6 +1,5 @@
 #include "net/EventLoop.h"
 #include "net/CurrentThread.h"
-#include "base/Log.h"
 #include <thread>
 
 using namespace ham;
@@ -18,11 +17,6 @@ void threadFunc()
 
 int main()
 {
-    // TODO: can this be a marco or func?
-    if(!Logger::Instance().init("Logger", "./log.txt", Logger::logLevel::trace))
-    {
-        return -1;
-    }
     std::cout << "In thread pid = " << std::this_thread::get_id()
             << " tid = " << CurrentThread::tid() << std::endl;
     EventLoop loop;

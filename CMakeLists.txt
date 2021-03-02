@@ -68,8 +68,16 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR})
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}/ham  # find spdlog
+    ${CMAKE_SOURCE_DIR}/thirdParty  # find thirdParty
 )
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}/ham  
+)
+
+include_directories(${PROJECT_SOURCE_DIR})
+
+
 
 include_directories(${GTEST_INCLUDE_DIRS})
 

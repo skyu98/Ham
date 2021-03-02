@@ -1,5 +1,4 @@
 #include "net/EventLoopThreadPool.h"
-#include "base/Log.h"
 #include "net/TcpServer.h"
 #include "net/TcpConnection.h"
 #include "net/EventLoop.h"
@@ -70,11 +69,6 @@ private:
 
 int main()
 {
-    if(!Logger::Instance().init("Logger", "./log.txt", Logger::logLevel::trace))
-    {
-        return -1;
-    }
-
     EventLoop loop;
     InetAddress listenAddr(8888);
     TestServer server(&loop, listenAddr, 4);
