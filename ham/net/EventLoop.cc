@@ -29,13 +29,30 @@ int createEventfd()
 }
 }
 
-class Log
-{
-    Log()
-    {
-        
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+class IgnoreSigPipe {
+public:
+    IgnoreSigPipe() {
+        ::signal(SIGPIPE, SIG_IGN);
+        TRACE("Ignore SIGPIPE");
     }
-}
+};
+#pragma GCC diagnostic error "-Wold-style-cast"
+IgnoreSigPipe initObj;
+
+// 和IgnoreSigPipe一样再全局中init
+class Log {
+public:
+    Log() 
+    {
+        if (!Logger::Instance().init("log", "logs/test.txt", Logger::logLevel::trace)) 
+        {
+		    ERROR("Logger init error");
+	    }
+    }
+};
+
+Log initLog;
 
 EventLoop::EventLoop() 
     : looping_(false),
