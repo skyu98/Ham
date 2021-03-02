@@ -15,3 +15,6 @@ target_link_libraries(EventLoopThread_test ham_net ham_base)
 
 add_executable(EventLoopThreadPool_unittest EventLoopThreadPool_unittest.cc)
 target_link_libraries(EventLoopThreadPool_unittest ham_net ham_base)
+
+add_executable(Buffer_unittest Buffer_unittest.cc)
+target_link_libraries(Buffer_unittest ham_net ham_base)

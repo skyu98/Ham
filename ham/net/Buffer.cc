@@ -86,6 +86,29 @@ namespace ham
             ::memcpy(&be64, peek(), sizeof(int64_t));
             return sockets::networkToHost16(be64);
         }
+
+        void Buffer::appendInt64(int64_t x)
+        {
+            int64_t be64 = sockets::hostToNetwork64(x);
+            append(&be64, sizeof(be64));
+        }
+
+        void Buffer::appendInt32(int32_t x)
+        {
+            int32_t be32 = sockets::hostToNetwork32(x);
+            append(&be32, sizeof(be32));
+        }
+
+        void Buffer::appendInt16(int16_t x)
+        {
+            int16_t be16 = sockets::hostToNetwork16(x);
+            append(&be16, sizeof(be16));
+        }
+
+        void Buffer::appendInt8(int8_t x)
+        {
+            append(&x, sizeof(x));
+        }
         
         int8_t Buffer::readInt8() 
         {
@@ -166,6 +189,15 @@ namespace ham
             assert(writableBytes() >= len);
         }
         
+        void Buffer::shrink(size_t reserve)
+        {
+            Buffer other;
+            size_t cur_readableBytes = readableBytes();
+            other.ensureWritableBytes(cur_readableBytes + reserve);
+            other.append(peek(), cur_readableBytes);
+            swap(other);
+        }
+
         void Buffer::append(const char* data, size_t len) 
         {
             ensureWritableBytes(len);
@@ -176,6 +208,11 @@ namespace ham
         void Buffer::append(const std::string& str) 
         {
             append(str.data(), str.size());
+        }
+
+        void Buffer::append(const void* data, size_t len) 
+        {
+            append(static_cast<const char*>(data), len);
         }
         
         void Buffer::prepend(const void* data, size_t len) 

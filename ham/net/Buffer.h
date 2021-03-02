@@ -44,6 +44,12 @@ public:
     int32_t readInt32();
     int64_t readInt64();
 
+    // 使用网络字节序写入一个整数
+    void appendInt64(int64_t x);
+    void appendInt32(int32_t x);
+    void appendInt16(int16_t x);
+    void appendInt8(int8_t x);
+
     // move the readIndex_ (after read)
     void retrieve(size_t len);
     void retrieveInt8() { retrieve(sizeof(int8_t)); }
@@ -56,12 +62,15 @@ public:
     std::string retrieveAllAsString();
 
     void ensureWritableBytes(size_t len);
+    void shrink(size_t reserve);
+
     char* beginWrite() { return begin() + writeIndex_; }
     const char* beginWrite() const { return begin() + writeIndex_; }
     void hasWritten(size_t len) { writeIndex_ += len; }
 
     void append(const char* data, size_t len);
     void append(const std::string& str);
+    void append(const void* data, size_t len);
     void prepend(const void* data, size_t len);
 
     ssize_t readFd(int fd, int* savedErrno);
