@@ -147,7 +147,7 @@ namespace ham
                         if(writeCompeleteCallback_)
                         {
                             loop_->queueInLoop(
-                                std::bind(&TcpConnection::writeCompeleteCallback_, 
+                                std::bind(writeCompeleteCallback_, 
                                 shared_from_this()));
                         }
                         if (state_ == State::kDisconnecting) {  // 如果之前调用了shutdown,但是还在output，没用关闭读端，留到此时关闭
@@ -203,7 +203,7 @@ namespace ham
                     if(remaining == 0 && writeCompeleteCallback_)
                     {
                         loop_->queueInLoop(
-                            std::bind(TcpConnection::writeCompeleteCallback_, 
+                            std::bind(writeCompeleteCallback_, 
                             shared_from_this()));
                         // 此处如果是runInLoop，那么如果writeCompeleteCallback_有send操作，
                         // 就会一直递归
@@ -232,7 +232,7 @@ namespace ham
                     && highWaterMarkCallback_)
                     {
                         loop_->queueInLoop(
-                            std::bind(TcpConnection::highWaterMarkCallback_,
+                            std::bind(highWaterMarkCallback_,
                             shared_from_this(), old_len + remaining));
                     }
                     outputBuffer_.append(static_cast<const char*>(data) + n_wrote, remaining);
