@@ -1,21 +1,21 @@
 add_executable(Reactor_test01 Reactor_test01.cc)
-target_link_libraries(Reactor_test01  ham_net ham_base)
+target_link_libraries(Reactor_test01 ham_net)
 
 add_executable(TimerQueue_unittest TimerQueue_unittest.cc)
-target_link_libraries(TimerQueue_unittest  ham_net ham_base)
+target_link_libraries(TimerQueue_unittest  ham_net)
 
 add_executable(Acceptor_unittest Acceptor_unittest.cc)
-target_link_libraries(Acceptor_unittest  ham_net ham_base)
+target_link_libraries(Acceptor_unittest  ham_net)
 
 add_executable(TcpServer_unittest TcpServer_unittest.cc)
-target_link_libraries(TcpServer_unittest  ham_net ham_base)
+target_link_libraries(TcpServer_unittest  ham_net)
 
 add_executable(EventLoopThread_test EventLoopThread_test.cc)
-target_link_libraries(EventLoopThread_test ham_net ham_base)
+target_link_libraries(EventLoopThread_test ham_net)
 
 add_executable(EventLoopThreadPool_unittest EventLoopThreadPool_unittest.cc)
-target_link_libraries(EventLoopThreadPool_unittest ham_net ham_base)
+target_link_libraries(EventLoopThreadPool_unittest ham_net)
 
 add_executable(Buffer_unittest Buffer_unittest.cc)
-target_link_libraries(Buffer_unittest ham_net ham_base)
+target_link_libraries(Buffer_unittest ham_net)
 add_test(NAME Buffer_unittest COMMAND Buffer_unittest)
