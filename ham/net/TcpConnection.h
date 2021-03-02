@@ -4,7 +4,7 @@
 #include <memory>   
 #include <string>
 #include <atomic>
-
+#include "net/Socket.h"
 #include "net/InetAddress.h"
 #include "net/Buffer.h"
 #include "net/Callbacks.h"
@@ -38,6 +38,7 @@ public:
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
     void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }
     void setHighWaterMarkCallback(const HighWaterMarkCallback& cb) { highWaterMarkCallback_ = cb; }
+    void setWriteCompeleteCallback(const WriteCompeleteCallback& cb) { writeCompeleteCallback_ = cb; }
 
     void establishConnection();
     void destoryConnection();
@@ -45,6 +46,7 @@ public:
     void send(const std::string& msg);
     void send(Buffer& buffer);
 
+    void setTcpNoDelay(bool on) { socket_->setTcpNoDelay(on);}
     void shutdown();
 
 private:

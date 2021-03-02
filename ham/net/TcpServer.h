@@ -6,6 +6,7 @@
 #include <functional>
 #include <boost/noncopyable.hpp>
 #include "net/Callbacks.h"
+#include "net/TcpConnection.h"
 namespace ham
 {
 namespace net
@@ -28,6 +29,7 @@ public:
 
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb) { messageCallback_ = cb; }
+    void setWriteCompeleteCallback(const WriteCompeleteCallback& cb) { writeCompeleteCallback_ = cb; }
     void setThreadInitCallback(const ThreadInitCallback& cb) { threadInitCallback_ = cb; }
 
     const std::string getName() const { return name_; }
@@ -50,9 +52,9 @@ private:
     std::unique_ptr<EventLoopThreadPool> loopThreadPool_;
     connectionMap connections_;
 
-    
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
+    WriteCompeleteCallback writeCompeleteCallback_;
     ThreadInitCallback threadInitCallback_;
 };
 

@@ -2,7 +2,6 @@
 #include "net/Channel.h"
 #include "net/Epoller.h"
 #include "net/TimerQueue.h"
-#include "base/Log.h"
 #include "base/Util.h"
 #include "net/CurrentThread.h"
 #include <sys/eventfd.h>
