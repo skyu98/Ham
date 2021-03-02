@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "ham/net/Buffer.h"
+#include "net/Buffer.h"
 
 using namespace ham;
 using namespace ham::net;

@@ -12,6 +12,8 @@ namespace ham
     namespace net
     {
         const char Buffer::kCRLF[]= "\r\n";
+        const size_t Buffer::kCheapPrepend;
+        const size_t Buffer::kInitialSize;
 
         Buffer::Buffer()
             : buffer_(kInitialSize + kCheapPrepend),
