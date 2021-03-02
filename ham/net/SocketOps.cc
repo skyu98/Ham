@@ -111,22 +111,7 @@ int accept(int sockfd, SA_in& addrin)
 }
 
 ssize_t read(int fd, void *buf, size_t nbyte){
-	ssize_t ret = 0;
-
-again:
-	ret = ::read(fd, buf, nbyte);
-	if(ret == -1)
-	{
-		if(errno == EINTR)
-		{
-			goto again;
-		}
-		else
-		{
-			ERROR("read error");
-		}
-	}
-	return ret;
+	return ::read(fd, buf, nbyte);
 }
 
 ssize_t readv(int fd, const struct iovec* vec, int iocnt) 
@@ -135,22 +120,7 @@ ssize_t readv(int fd, const struct iovec* vec, int iocnt)
 }
 
 ssize_t write(int fd, const void *buf, size_t nbyte){
-	ssize_t ret = 0;
-
-again:
-	ret = ::write(fd, buf, nbyte);
-	if(ret == -1)
-	{
-		if(errno == EINTR)
-		{
-			goto again;
-		}
-		else
-		{
-			ERROR("write error");
-		}
-	}
-	return ret;
+	return ::write(fd, buf, nbyte);
 }
 
 ssize_t write(int fd, const std::string& msg){
