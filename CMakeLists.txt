@@ -89,3 +89,4 @@ message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_T
 
 add_subdirectory(ham/base)
 add_subdirectory(ham/net)
+add_subdirectory(examples)
