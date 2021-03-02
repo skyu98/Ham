@@ -7,7 +7,7 @@ using namespace ham::net;
 
 int main()
 {
-    // LOG_LEVEL_INFO;
+    LOG_LEVEL_INFO;
     INFO("pid = {}", CurrentThread::tid());
     EventLoop loop;
     InetAddress listenAddr(8888);
