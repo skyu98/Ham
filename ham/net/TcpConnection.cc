@@ -150,6 +150,9 @@ namespace ham
                                 std::bind(&TcpConnection::writeCompeleteCallback_, 
                                 shared_from_this()));
                         }
+                        if (state_ == State::kDisconnecting) {  // 如果之前调用了shutdown,但是还在output，没用关闭读端，留到此时关闭
+                            shutdownInLoop();
+                        }
                     }
                 }
                 else

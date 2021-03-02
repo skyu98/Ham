@@ -43,7 +43,7 @@ namespace ham
             void readAlarmfd(int alarmFd, Timestamp now) {
                 uint64_t howmany;
                 ssize_t n = ::read(alarmFd, &howmany, sizeof(howmany));
-                TRACE("TimerQueue::handleRead {} at {}", howmany, now.toString());
+                TRACE("TimerQueue::handleRead {} at {}", howmany, now.toFormatTime());
                 if(n != sizeof(howmany)) {
                     ERROR("TimerQueue::handleRead reads {} bytes instead of 8", n);
                 }   
