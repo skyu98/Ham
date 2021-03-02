@@ -234,12 +234,12 @@ namespace ham
                             shared_from_this(), old_len + remaining));
                     }
                     outputBuffer_.append(static_cast<const char*>(data) + n_wrote, remaining);
-                }
 
-                // 关注可写事件，可写时将剩余数据发出
-                if(!channel_->isWriting())
-                {
-                    channel_->enableWriting();
+                     // 关注可写事件，可写时将剩余数据发出
+                    if(!channel_->isWriting())
+                    {
+                        channel_->enableWriting();
+                    }
                 }
             }
         }

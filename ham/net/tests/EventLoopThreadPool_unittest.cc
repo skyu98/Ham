@@ -59,8 +59,9 @@ private:
     {
         std::string msg(buf.retrieveAllAsString());
         std::cout << "New message from " << conn->getName() << std::endl
-            << "it says:" << msg << std::endl
+            << "it says:" << msg 
             << " and its len is " << msg.size() << std::endl;
+        conn->send(std::move(msg));
     }  
 
     EventLoop* baseLoop_;

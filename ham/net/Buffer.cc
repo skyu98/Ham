@@ -133,6 +133,8 @@ namespace ham
             // 全部读完，read和write都回到起点
             readIndex_ = kCheapPrepend; 
             writeIndex_ = kCheapPrepend; 
+            std::cout << "retrieveAll()!!! WriteIndex at " << writeIndex_ << std::endl;
+            std::cout << "retrieveAll()!!! ReadIndex at " << readIndex_ << std::endl;
         }
         
         void Buffer::retrieveUtil(const char* end) 
@@ -184,6 +186,10 @@ namespace ham
             std::copy(data_pre, data_pre + len, begin() + readIndex_);
         }
         
+        // 结合栈上的空间，避免内存使用过大，提高内存使用率
+        // 如果有1K个链接，每个连接都分配64K的（发生/接收）缓冲区的话，将独占640M内存
+        // 而大多数时候，缓冲区的使用率都很低
+        // https://www.cnblogs.com/solstice/archive/2011/04/17/2018801.html
         ssize_t Buffer::readFd(int fd, int* savedErrno) 
         {
             char extraBuf[65536];
@@ -196,6 +202,8 @@ namespace ham
             vec[1].iov_base = extraBuf;
             vec[1].iov_len = sizeof(extraBuf);
 
+            std::cout << "before readFd()!!! WriteIndex at " << writeIndex_ << std::endl;
+
             // TODO : 为什么是这样比较？
             const int iovcnt = 2 ;// writableBytes() < sizeof(extraBuf) ? 2 : 1;
             const ssize_t n = sockets::readv(fd, vec, iovcnt);
@@ -206,6 +214,8 @@ namespace ham
             else if(implicit_cast<size_t>(n) <= writable) 
             {
                 writeIndex_ += n;
+                std::cout << "readFd() over!!! WriteIndex at " << writeIndex_ << std::endl;
+
             } 
             else 
             {
