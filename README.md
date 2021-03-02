@@ -58,3 +58,47 @@ typedef union epoll_data
 } epoll_data_t;
 ```
 struct epoll_event里的data是个共用体Union，共享同一片内存，所以只能写一个成员，否则数据会被覆盖；导致ptr不能指向有效的channel。
+
+# net
+
+## 1.EventLoop
+```EventLoop```的本质是一个IO线程。我们笼统地分析，一个IO线程至少需要以下部件：
+* 1.```Epoller```:用于关注套接字（```listen_fd```、```conn_fd```）
+* 2.```vector<Functor>```:在处理完每个回调函数之后，做一些额外的工作（如取消关注、修改关注、销毁连接等等）
+* 3.```mutex```:上述的容器是可以跨线程来添加任务的，所以我们需要一把```Mutex```，来管理线程间的同步
+* 4.```wakeup_fd```:有时我们需要IO线程处理任务，但它正阻塞在```epoll_wait()```上，这时就需要通过```wakeup_fd```来唤醒IO线程
+
+除此之外，在某些场景下，我们需要IO线程在某个特定的时刻去完成某些任务。因此，我们需要加入一个```TimerQueue```部件，来管理所有的定时任务。此部分详见```TimerQueue```。
+
+由于这里有了线程所属的概念，所以对于每个函数，我们都要考虑其可不可以跨线程调用：如果不可以，则一定加上assert来验证。
+
+## 2.Channel
+回忆C语言写的简单Reactor中，每个fd上树时，我们通过下面的结构体来保存信息:
+```cpp
+typedef union epoll_data
+{
+  void *ptr;
+  int fd;
+  uint32_t u32;
+  uint64_t u64;
+} epoll_data_t;
+
+struct epoll_event
+{
+  uint32_t events;	/* Epoll events */
+  epoll_data_t data;	/* User data variable */
+} __EPOLL_PACKED;
+```
+
+这样肉眼可见有三个缺点：
+* 1. ```epoll_data_t```是Union，即只能保存一种信息，否则会被覆盖；显然我们需要
+```void *ptr```来保存回调函数指针，那么fd则无法被保存。
+* 2. 在半同步半异步模型中，不止一个```EventLoop```，那么一个fd我们还需要保存其所属线程，原来的结构体无法实现。
+* 3. 在实际情况下，epoll返回的事件并不一定就是关注的事件（可能是EPOLLHUP之类的），所以我们需要同时知道一个fd关注的事件和返回的事件。
+
+所以我们使用一个Channel对象来对fd进行封装，它具有：
+* 1. ```loop_```:该fd所属```EventLoop```
+* 2. callbacks:即不同情况下应该调用的回调函数对象
+* 3. ```event_```&```revent```:即关注的事件和返回的事件
+
+这就是最基础的```Channel```构架。需要注意的是，```Channel```只是对fd进行封装，它并不拥有fd，即它不负责fd的生命周期。
