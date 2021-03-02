@@ -18,6 +18,14 @@ namespace ham
             + "." + std::to_string(microsecondsFromEpoch_ % kMicrosecondsPerSecond);
     }
     
+    std::string Timestamp::toFormatTime() const
+    {
+        std::time_t time = microsecondsFromEpoch_ / kMicrosecondsPerSecond;  // ms --> s
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&time), "%Y-%m-%d %X");
+        return ss.str();
+    }
+    
     Timestamp Timestamp::now() 
     {
         int64_t nowFromEpoch = duration_cast<microseconds>

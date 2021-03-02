@@ -5,6 +5,8 @@
 #include "Types.h"
 #include <string>
 #include <chrono>
+#include <sstream>
+#include <iomanip>
 #include <boost/operators.hpp>
 
 namespace ham
@@ -23,6 +25,7 @@ public:
     // defalut assignment & copy ctr is ok
     
     std::string toString() const;
+    std::string toFormatTime() const;
 
     Timestamp& swap(Timestamp& src);
     
