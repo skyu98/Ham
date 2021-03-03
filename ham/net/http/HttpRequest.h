@@ -11,7 +11,7 @@ namespace ham
 namespace net
 {
 
-class HttpRequest
+class HttpRequest : public copyable
 {
 public:
     enum Method
