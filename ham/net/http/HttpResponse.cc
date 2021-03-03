@@ -44,7 +44,6 @@ namespace ham
             }
 
             outputBuffer.append("\r\n");
-
             // body
             outputBuffer.append(body_);
         }

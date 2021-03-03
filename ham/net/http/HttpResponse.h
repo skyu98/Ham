@@ -34,14 +34,17 @@ public:
 
     void setStateCode(StateCode code){ stateCode_ = code; }
     void setStateMessage(const std::string& message){ stateMessage_ = message; }
+    
     void setBody(const std::string& body){ body_ = body; }
     void setBody(std::string&& body){ body_ = std::move(body); }
+    
     void setCloseConnection(bool on){ closeConnection_ = on; }
     void setContentType(const std::string& contentType)
     {
         addHeader("Content-Type", contentType);
     }
 
+    // 这里已经是解析好field和value了，所以直接存放
     void addHeader(const std::string& field, const std::string& value)
     {
         headers_[field] = value;
