@@ -13,7 +13,14 @@ namespace ham
             : loop_(loop),
               server_(loop, listenAddr, name)
         {
-            
+            server_.setConnectionCallback(
+                std::bind(&HttpServer::onConnection, this,
+                std::placeholders::_1));
+            server_.setMessageCallback(
+                std::bind(&HttpServer::onMessage, this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3));
         }
         
         void HttpServer::start() 
@@ -55,7 +62,18 @@ namespace ham
             bool isShortConn = (connType == "close") ||
                                 (request.version() == HttpRequest::kHttp10 
                                 && connType != "Keep-Alive");
+
             HttpResponse response(isShortConn);
+            httpCallback_(request, response);
+
+            Buffer buf;
+            response.appendToBuffer(buf);
+            conn->send(buf);
+            
+            if(response.closeConnection())
+            {
+                conn->shutdown();
+            }
         }
     }
 }
