@@ -43,6 +43,9 @@ public:
     const std::string& path() const { return path_; }
     void setPath(const char* start, const char* end) { path_.assign(start, end); }
 
+    const std::string& query() const { return query_; }
+    void setQuery(const char* start, const char* end) { query_.assign(start, end); }
+
     const std::string& body() const { return body_; }
     void setBody(const std::string& body) { body_ = body; }
     void setBody(std::string&& body) { body_ = std::move(body); }
@@ -67,6 +70,7 @@ private:
     Version version_;
     Timestamp receiveTime_;
     std::string path_;
+    std::string query_; // GET请求时所带的参数；在?之后，Key-Value形式
     std::string body_;
     std::map<std::string, std::string> headers_;  // 按名字：内容存放
 };
