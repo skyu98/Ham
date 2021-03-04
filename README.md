@@ -102,3 +102,38 @@ struct epoll_event
 * 3. ```event_```&```revent```:即关注的事件和返回的事件
 
 这就是最基础的```Channel```构架。需要注意的是，```Channel```只是对fd进行封装，它并不拥有fd，即它不负责fd的生命周期。
+
+# Http
+对于每一个```TcpConnection```，有一个```context```上下文对象；当该连接有Http包到来，```context```则会对该包进行解析，并且将解析结果存放在自己的```HttpRequest```成员中。
+
+## 1.HttpRequest
+一个简单的Http请求报文如下：
+
+    GET /simple.html HTTP/1.1<CRLF>       ----- 请求行 
+    Accept: text/html<CRLF>               -- 头部
+    Accept-Language: zh-cn<CRLF>             
+    Accept-Encoding: gzip, deflate<CRLF>  -- 头部 
+    User-Agent: Mozilla/4.0<CRLF>            
+    Host: localhost:8080<CRLF>               
+    Connection: Keep-Alive<CRLF>          -- 头部
+    <CRLF>                                ----- 空白行表示头部的结束
+    // body                               ----- 接下来的内容是正文部分
+
+一个Http请求包分为下列部分：
+* 1.Method:GET/POST...
+* 2.path
+* 3.Version:Http 1.1/ 1.0
+* 4.headers:保存在```map<filed, value>```中
+* 5.body
+
+所有的对象都由```context```解析请求包得来.
+
+## 2.HttpContext
+这里使用一个```state```来表示当前的解析状态。
+* 对于request line：分割出Method、path、Version，并且保存。
+* 对于headers：分割出每一行```field: value```，交给```HttpRequest```保存
+* 对于body：暂时未实现
+
+每个状态都处理完后，整个包也就处理完毕并保存了。
+
+## 3.HttpResponse

@@ -1,6 +1,7 @@
 #ifndef __TCPCONNECTION_H__
 #define __TCPCONNECTION_H__
 #include <boost/noncopyable.hpp>
+#include <boost/any.hpp>
 #include <memory>   
 #include <string>
 #include <atomic>
@@ -89,6 +90,8 @@ private:
     CloseCallback closeCallback_;
     WriteCompeleteCallback writeCompeleteCallback_;
     HighWaterMarkCallback highWaterMarkCallback_;
+
+    boost::any context_;
 };
 
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;

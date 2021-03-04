@@ -43,6 +43,10 @@ public:
     const std::string& path() const { return path_; }
     void setPath(const char* start, const char* end) { path_.assign(start, end); }
 
+    const std::string& body() const { return body_; }
+    void setBody(const std::string& body) { body_ = body; }
+    void setBody(std::string&& body) { body_ = std::move(body); }
+
     const std::map<std::string, std::string>& headers() const { return headers_; }
     void addHeader(const char* start, const char* colon, const char* end);
     std::string getHeader(const std::string& field) const;
@@ -63,6 +67,7 @@ private:
     Version version_;
     Timestamp receiveTime_;
     std::string path_;
+    std::string body_;
     std::map<std::string, std::string> headers_;  // 按名字：内容存放
 };
 
