@@ -30,6 +30,11 @@ public:
 
     const std::string getName() const { return name_; } 
     EventLoop* getOwnnerLoop() const { return loop_; }
+
+    void setContext(const boost::any& context) { context_ = context; }
+    const boost::any& getContext() const { return context_; }
+    boost::any& getMutableContext() { return context_; }
+
     const InetAddress& localAddress() { return localAddr_; }
     const InetAddress& peerAddress() { return peerAddr_; }
 

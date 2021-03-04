@@ -32,8 +32,9 @@ public:
     void setWriteCompeleteCallback(const WriteCompeleteCallback& cb) { writeCompeleteCallback_ = cb; }
     void setThreadInitCallback(const ThreadInitCallback& cb) { threadInitCallback_ = cb; }
 
-    const std::string getName() const { return name_; }
-    const std::string getHostPost() const { return hostPost_; } 
+    const std::string& getName() const { return name_; }
+    const std::string& getHostPost() const { return hostPost_; } 
+    const EventLoop* getLoop() const { return loop_; }
 
 private:
     void newConnectionCallback(int connfd, const InetAddress& peerAddr);
