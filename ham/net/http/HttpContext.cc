@@ -66,7 +66,42 @@ namespace ham
         
         bool HttpContext::parseRequestLine(const char* begin, const char* end) 
         {
-            
+            // GET<space>/simple.html<space>HTTP/1.1 -- 请求行(未传入<CRLF>）
+            bool succeed = false;
+            auto space = std::find(begin, end, ' ');
+            const char* start = begin;
+            if(space != end && request_.setMethod(begin, space)) // method done
+            {
+                start = space + 1;
+                space = std::find(start, end, ' ');
+                if(space != end)
+                {
+                    auto question = std::find(start, space, '?');
+                    if(question != space)
+                    {
+                        request_.setQuery(question + 1, space);  // query done
+                    }
+                    request_.setPath(start, question);  // path done
+                }
+                start = space + 1;
+                succeed = ((end - start == 8) && std::equal(start, end - 1, "Http/1."));
+                if(succeed)
+                {
+                    if(*(end - 1) == '0')
+                    {
+                        request_.setVersion(HttpRequest::Version::kHttp10);
+                    }
+                    else if(*(end - 1) == '1')
+                    {
+                        request_.setVersion(HttpRequest::Version::kHttp11);  // version done
+                    }
+                    else
+                    {
+                        succeed = false;
+                    }
+                }
+            }
+            return succeed;
         }
     }
 }
