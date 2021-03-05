@@ -84,7 +84,9 @@ namespace ham
                     request_.setPath(start, question);  // path done
                 }
                 start = space + 1;
-                succeed = ((end - start == 8) && std::equal(start, end - 1, "Http/1."));
+                std::string s(start, end - 1);
+                
+                succeed = ((end - start == 8) && std::equal(start, end - 1, "HTTP/1."));
                 if(succeed)
                 {
                     if(*(end - 1) == '0')

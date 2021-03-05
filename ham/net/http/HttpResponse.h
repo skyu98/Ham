@@ -14,7 +14,7 @@ class HttpResponse : public copyable
 public:
     enum Version
     {
-        kUnknown, kHttp10, kHttp11
+        kUnknownVersion, kHttp10, kHttp11
     };
 
     enum StateCode
@@ -27,7 +27,7 @@ public:
     };
 
     explicit HttpResponse(bool closeConn)
-        : version_(kUnknown),
+        : version_(kUnknownVersion),
           stateCode_(StateCode::kUnknown),
           closeConnection_(closeConn)
           {}

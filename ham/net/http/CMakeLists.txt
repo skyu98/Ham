@@ -5,7 +5,7 @@ set(http_SRCS
   HttpServer.cc
   )
 
-add_library(ham_http ${net_SRCS})
+add_library(ham_http ${http_SRCS})
 target_link_libraries(ham_http ham_net ham_base)
 
 install(TARGETS ham_http DESTINATION lib)

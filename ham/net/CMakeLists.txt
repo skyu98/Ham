@@ -26,3 +26,5 @@ install(FILES ${HEADERS} DESTINATION include/ham/net)
 if(HAM_BUILD_EXAMPLES)
   add_subdirectory(tests)
 endif()
+
+add_subdirectory(http)
