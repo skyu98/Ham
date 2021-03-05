@@ -6,7 +6,7 @@ namespace ham
 {
     namespace net
     {
-        bool HttpContext::parseHttpRequest(Buffer& inputBuffer, Timestamp receiveTime) 
+        bool HttpContext::parseRequest(Buffer& inputBuffer, Timestamp receiveTime) 
         {
             bool hasMore = true; 
             bool okWithRequestLine = true;

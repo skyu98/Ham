@@ -21,7 +21,7 @@ public:
 
     HttpContext(): parseState_(kExpectRequestLine){}
 
-    bool parseHttpRequest(Buffer& inputBuffer, Timestamp receiveTime);
+    bool parseRequest(Buffer& inputBuffer, Timestamp receiveTime);
 
     const HttpRequest& request() const { return request_; }
     HttpRequest& request() { return request_; }

@@ -42,7 +42,7 @@ namespace ham
         void HttpServer::onMessage(const TcpConnectionPtr& conn, Buffer& inputBuffer, Timestamp receiveTime) 
         {
             HttpContext context = boost::any_cast<HttpContext>(conn->getMutableContext());
-            if(!context.parseHttpRequest(inputBuffer, receiveTime))
+            if(!context.parseRequest(inputBuffer, receiveTime))
             {
                 conn->send("HTTP/1.1 400 Bad Request\r\n\r\n");
                 conn->shutdown();
