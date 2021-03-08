@@ -48,7 +48,6 @@ namespace ham
                     else   // 没有换行符，说明后面没内容了
                     {
                         hasMore = false;
-                        parseState_ = kGotAll;
                     }
                 }
                 else if(parseState_ == kExpectBody)
