@@ -110,6 +110,11 @@ int accept(int sockfd, SA_in& addrin)
     return connFd;
 }
 
+int connect(int sockfd, const SA_in* serverAddr) 
+{
+    return ::connect(sockfd, sockaddr_cast(serverAddr), sizeof(serverAddr)); 
+}
+
 ssize_t read(int fd, void *buf, size_t nbyte){
 	return ::read(fd, buf, nbyte);
 }
