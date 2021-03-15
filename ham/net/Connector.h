@@ -1,8 +1,9 @@
 #ifndef __CONNECTOR_H__
 #define __CONNECTOR_H__
-#include "net/Socket.h"
+
 #include "net/Channel.h"
 #include "net/InetAddress.h"
+#include <boost/noncopyable.hpp>
 #include <memory>
 #include <functional>
 #include <atomic>
@@ -13,7 +14,7 @@ namespace ham
 namespace net
 {
 
-class Connector
+class Connector : public boost::noncopyable
 {
 public:
     // 不同于Acceptor的cb，connector中对端和本端的ip+port都是确定的，不需要再作为参数传出
@@ -29,6 +30,11 @@ public:
 
     const InetAddress& serverAddr() const { return serverAddr_; }
 private:
+    void startInLoop();
+    void stopInLoop();
+    void connect();
+    void tryEstablishConnection();
+
     /* data */
     enum State { kDisconnected, kConnecting, kConnected };
     static const int kMaxRetryDelayMs = 30*1000;			// 30秒，最大重连延迟时间
@@ -38,9 +44,9 @@ private:
     InetAddress serverAddr_;
     std::atomic<State> state_;
     std::unique_ptr<Channel> connectChannel_;
-    std::unique_ptr<Socket> connectSocket_;
-
     newConnectionCallback cb_;
+    std::atomic_bool connect_;
+    int retryDelayMs_;		// 重连延迟时间（单位：毫秒）
 };
 }
 }
