@@ -14,7 +14,8 @@ namespace ham
 namespace net
 {
 
-class Connector : public boost::noncopyable
+class Connector : public boost::noncopyable, 
+                  public std::enable_shared_from_this<Connector>
 {
 public:
     // 不同于Acceptor的cb，connector中对端和本端的ip+port都是确定的，不需要再作为参数传出
@@ -33,7 +34,15 @@ private:
     void startInLoop();
     void stopInLoop();
     void connect();
-    void tryEstablishConnection();
+    void establishConnection(int fd);
+    void retry(int fd);
+
+    void handleWrite();
+    void handleRead();
+    void handleError();
+
+    int removeAndResetChannel();
+    void resetChannel();
 
     /* data */
     enum State { kDisconnected, kConnecting, kConnected };
@@ -47,6 +56,7 @@ private:
     newConnectionCallback cb_;
     std::atomic_bool connect_;
     int retryDelayMs_;		// 重连延迟时间（单位：毫秒）
+    TimerId retryTimerId_;
 };
 }
 }

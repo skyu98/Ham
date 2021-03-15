@@ -1,5 +1,7 @@
+[toc]
+
 # Ham
-C++11 server based on muduo
+C++11 server based on muduoß
 
 # Base 
 
@@ -102,6 +104,11 @@ struct epoll_event
 * 3. ```event_```&```revent```:即关注的事件和返回的事件
 
 这就是最基础的```Channel```构架。需要注意的是，```Channel```只是对fd进行封装，它并不拥有fd，即它不负责fd的生命周期。
+
+## 3.TcpClient
+```socket()``` -> ```connect()``` -> epoller检查可写 -> 连接成功 -> callback
+<br>
+发送消息 -> 服务端回复 -> 可读事件 -> ```handleRead()/handleError()```
 
 # Http
 对于每一个```TcpConnection```，有一个```context```上下文对象；当该连接有Http包到来，```context```则会对该包进行解析，并且将解析结果存放在自己的```HttpRequest```成员中。
