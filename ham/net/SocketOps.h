@@ -31,7 +31,7 @@ int createNonblockingOrDie();
 void bindOrDie(int sockfd, const SA_in& addrin);
 void listenOrDie(int socket);
 int accept(int sockfd, SA_in& addrin);
-int connect(int sockfd, const SA_in* serverAddr);
+int connect(int sockfd, const SA_in& serverAddr);
 
 ssize_t read(int fd, void *buf, size_t nbyte);
 ssize_t readv(int fd, const struct iovec*, int iocnt);
