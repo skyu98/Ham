@@ -32,6 +32,7 @@ void bindOrDie(int sockfd, const SA_in& addrin);
 void listenOrDie(int socket);
 int accept(int sockfd, SA_in& addrin);
 int connect(int sockfd, const SA_in& serverAddr);
+bool isSelfConnect(int sockfd);
 
 ssize_t read(int fd, void *buf, size_t nbyte);
 ssize_t readv(int fd, const struct iovec*, int iocnt);
@@ -43,6 +44,7 @@ void shutdownWrite(int sockfd);
 void ipPortToAddrin(const std::string& ip, uint16_t port, SA_in* addr);
 std::string toIpStr(const SA_in* addr);
 SA_in getLocalAddr(int sockfd);
+SA_in getPeerAddr(int sockfd);
 int getSocketError(int sockfd);
 
 }

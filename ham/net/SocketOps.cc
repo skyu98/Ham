@@ -119,6 +119,21 @@ ssize_t read(int fd, void *buf, size_t nbyte){
 	return ::read(fd, buf, nbyte);
 }
 
+// 自连接是指(sourceIP, sourcePort) = (destIP, destPort)
+// 自连接发生的原因:
+// 客户端在发起connect的时候，没有bind(2)
+// 客户端与服务器端在同一台机器，即sourceIP = destIP，
+// 服务器尚未开启，即服务器还没有在destPort端口上处于监听
+// 就有可能出现自连接，这样，服务器也无法启动了
+
+bool sockets::isSelfConnect(int sockfd)
+{
+  struct sockaddr_in localaddr = getLocalAddr(sockfd);
+  struct sockaddr_in peeraddr = getPeerAddr(sockfd);
+  return localaddr.sin_port == peeraddr.sin_port
+      && localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
+}
+
 ssize_t readv(int fd, const struct iovec* vec, int iocnt) 
 {
     return ::readv(fd, vec, iocnt);
@@ -188,6 +203,17 @@ SA_in getLocalAddr(int sockfd) {
         ERROR("sockets::getLocalAddr");
     }
     return localaddr;
+}
+
+SA_in getPeerAddr(int sockfd) 
+{
+    SA_in peeraddr;
+    bzero(&peeraddr, sizeof(peeraddr));
+    socklen_t addrlen = static_cast<socklen_t>(sizeof(peeraddr));
+    if(::getpeername(sockfd, sockaddr_cast(&peeraddr), &addrlen) < 0) {
+        ERROR("sockets::getPeerAddr");
+    }
+    return peeraddr;
 }
 
 int getSocketError(int sockfd) 
