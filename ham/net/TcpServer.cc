@@ -70,7 +70,7 @@ namespace ham
             newTcpConn->setMessageCallback(messageCallback_);
             newTcpConn->setCloseCallback(std::bind(&TcpServer::removeConnection,
                                                     this, std::placeholders::_1));
-            newTcpConn->setWriteCompeleteCallback(writeCompeleteCallback_);
+            newTcpConn->setWriteCompleteCallback(writeCompleteCallback_);
             // 此处将conn交给nextIoLoop来负责，而不是baseLoop
             nextIoLoop->runInLoop(std::bind(&TcpConnection::establishConnection, newTcpConn));
         }

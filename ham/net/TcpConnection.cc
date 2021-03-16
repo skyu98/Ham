@@ -144,10 +144,10 @@ namespace ham
                     if(outputBuffer_.readableBytes() == 0)// 数据全部写完
                     {
                         channel_->disableWriting();  // 立即取消关注可写，否则busy loop
-                        if(writeCompeleteCallback_)
+                        if(writeCompleteCallback_)
                         {
                             loop_->queueInLoop(
-                                std::bind(writeCompeleteCallback_, 
+                                std::bind(writeCompleteCallback_, 
                                 shared_from_this()));
                         }
                         if (state_ == State::kDisconnecting) {  // 如果之前调用了shutdown,但是还在output，没用关闭读端，留到此时关闭
@@ -200,10 +200,10 @@ namespace ham
                 if(n_wrote >= 0)
                 {
                     remaining -= n_wrote;
-                    if(remaining == 0 && writeCompeleteCallback_)
+                    if(remaining == 0 && writeCompleteCallback_)
                     {
                         loop_->queueInLoop(
-                            std::bind(writeCompeleteCallback_, 
+                            std::bind(writeCompleteCallback_, 
                             shared_from_this()));
                         // 此处如果是runInLoop，那么如果writeCompeleteCallback_有send操作，
                         // 就会一直递归
