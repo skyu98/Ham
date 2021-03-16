@@ -106,9 +106,10 @@ struct epoll_event
 这就是最基础的```Channel```构架。需要注意的是，```Channel```只是对fd进行封装，它并不拥有fd，即它不负责fd的生命周期。
 
 ## 3.TcpClient
-```socket()``` -> ```connect()``` -> epoller检查可写 -> 连接成功 -> callback
-<br>
-发送消息 -> 服务端回复 -> 可读事件 -> ```handleRead()/handleError()```
+### 1.Connector
+只负责连接的建立，```connectChannel```也是只存在此期间
+```socket()```创建fd -> ```connect()``` -> epoller检查可写/Error -> 连接成功 -> newConnCallback -> 交给```TcpClient```创建新```TcpConnection```
+
 
 # Http
 对于每一个```TcpConnection```，有一个```context```上下文对象；当该连接有Http包到来，```context```则会对该包进行解析，并且将解析结果存放在自己的```HttpRequest```成员中。
