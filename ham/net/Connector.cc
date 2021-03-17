@@ -14,7 +14,8 @@ namespace ham
               state_(kDisconnected),
               connect_(false),
               retryDelayMs_(kInitRetryDelayMs),
-              retryTimerId_(nullptr, -1)
+              retryTimerId_(nullptr, -1),
+              validTimer_(false)
         {
             INFO("Connector {} ctor", fmt::ptr(this));
         }
@@ -22,7 +23,7 @@ namespace ham
         Connector::~Connector() 
         {
             INFO("Connector {} dtor", fmt::ptr(this));
-            if (connectChannel_)  // 还没返回可写，就进入析构
+            if (connectChannel_)  // channel不为空，说明还没返回可写就进入析构
             {
                 stop();     // 那么说明现在在connecting，需要先停止
             }
@@ -48,7 +49,11 @@ namespace ham
         {
             connect_ = false;
             loop_->runInLoop(std::bind(&Connector::stopInLoop, this));
-            loop_->cancelTimer(retryTimerId_);  // 取消定时器，避免之后再触发
+            if(validTimer_)
+            {
+                loop_->cancelTimer(retryTimerId_);  // 取消定时器，避免之后再触发
+            }
+            
         }
         
         void Connector::startInLoop() 
@@ -69,7 +74,7 @@ namespace ham
         void Connector::stopInLoop() 
         {
             loop_->assertInLoopThread();
-            // 如果是已经建立连接，那么channel已经为空，fd也由TcpConn负责
+            // 如果是已经建立连接，那么channel已经为空，fd由TcpConn负责；这里只负责正在连接的情况
             if(state_ == kConnecting)  
             {
                 state_ = kDisconnected;
@@ -144,6 +149,7 @@ namespace ham
                 // TODO:既然已经在stop()中取消了定时器，是否可以直接用this？
                 retryTimerId_ = loop_->runAfter(retryDelayMs_/1000.0, 
                                                 std::bind(&Connector::startInLoop, shared_from_this()));
+                validTimer_ = true;
                 if(retryDelayMs_ == kMaxRetryDelayMs)
                 {
                     WARN("Retry Delay now is max({})", kMaxRetryDelayMs/1000);

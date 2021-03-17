@@ -48,6 +48,7 @@ public:
 
     void establishConnection();
     void destoryConnection();
+    void forceClose();
 
     void send(const std::string& msg);
     void send(Buffer& buffer);
@@ -74,6 +75,7 @@ private:
     void sendInLoop(const std::string& msg);
     void sendInLoop(const void* data, size_t len);
     void shutdownInLoop();
+    void forceCloseInLoop();
 
     EventLoop* loop_;
     std::string name_;

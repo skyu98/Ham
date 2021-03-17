@@ -22,6 +22,7 @@ public:
 
     void connect();
     void disconnect();
+    void stop();
     
     void setRetry(bool on) { retry_ = on; }
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }
@@ -31,14 +32,17 @@ public:
     TcpConnectionPtr getConnection () const { return establishedConnection_; }
 
 private:
-    void reConnect();
     void newConnection(int fd);
+    void removeConnection(const TcpConnectionPtr& conn);
 
 private:
     /* data */
     EventLoop* loop_;
     InetAddress serverAddr_;
-    std::atomic_bool retry_;
+    std::atomic_bool retry_;    // 连接关闭后是否重连
+    std::atomic_bool connect_;  // 是否连接
+    std::string name_;
+    int nextConnId_;
     std::unique_ptr<Connector> connector_;
     TcpConnectionPtr establishedConnection_;
 

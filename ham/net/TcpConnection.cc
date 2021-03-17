@@ -59,6 +59,15 @@ namespace ham
             channel_->remove();
         }
         
+        void TcpConnection::forceClose() 
+        {
+            if(state_ == State::kConnected || state_ == State::kDisconnecting)
+            {
+                setState(State::kDisconnecting);
+                loop_->queueInLoop(std::bind(&TcpConnection::forceCloseInLoop, shared_from_this()));
+            }
+        }
+        
         void TcpConnection::send(const std::string& msg) 
         {
             if(state_ == kConnected)
@@ -253,6 +262,15 @@ namespace ham
             {
                 setState(kDisconnected);
                 socket_->shutdownWrite();
+            }
+        }
+        
+        void TcpConnection::forceCloseInLoop() 
+        {
+            loop_->assertInLoopThread();
+            if(state_ == State::kConnected || state_ == State::kDisconnecting)
+            {
+                handleClose();  // 直接通过该函数销毁连接
             }
         }
     }

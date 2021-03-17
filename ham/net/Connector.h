@@ -57,6 +57,7 @@ private:
     std::atomic_bool connect_;
     int retryDelayMs_;		// 重连延迟时间（单位：毫秒）
     TimerId retryTimerId_;
+    bool validTimer_;
 };
 }
 }
