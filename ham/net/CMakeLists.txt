@@ -13,8 +13,8 @@ set(net_SRCS
   TcpConnection.cc
   EventLoopThread.cc
   EventLoopThreadPool.cc
-  Connector.cc
   TcpClient.cc
+  Connector.cc
   )
 
 add_library(ham_net ${net_SRCS})

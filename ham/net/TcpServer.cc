@@ -59,7 +59,7 @@ namespace ham
         {
             loop_->assertInLoopThread();
             EventLoop* nextIoLoop = loopThreadPool_->getNextLoop();
-            std::string name = hostPost_ + std::to_string(nextConnId_++);
+            std::string name = hostPost_ + "#" +std::to_string(nextConnId_++);
             InetAddress localAddr (sockets::getLocalAddr(connfd));
 
             TcpConnectionPtr newTcpConn = std::make_shared<TcpConnection>(

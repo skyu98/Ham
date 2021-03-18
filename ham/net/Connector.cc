@@ -8,6 +8,7 @@ namespace ham
 {
     namespace net
     {
+        const int Connector::kMaxRetryDelayMs;
         Connector::Connector(EventLoop* loop, const InetAddress& serverAddr) 
             : loop_(loop),
               serverAddr_(serverAddr),

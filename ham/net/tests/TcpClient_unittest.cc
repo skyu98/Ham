@@ -1,6 +1,7 @@
 #include "net/EventLoop.h"
 #include "net/TcpClient.h"
 #include "net/Channel.h"
+#include "base/Util.h"
 #include <functional>
 #include <string>
 #include <memory>
@@ -11,11 +12,13 @@ using namespace ham::net;
 
 class TestClient
 {
+public:
     TestClient(EventLoop* loop,
             const InetAddress& serverAddr,
             const std::string& name = "TestClient")
         : loop_(loop),
-          client_(loop, serverAddr, name)
+          client_(loop, serverAddr, name),
+          STDIN_channel_(util::make_unique<Channel>(loop, STDIN_FILENO))
         {
             client_.setConnectionCallback(std::bind(&TestClient::onConnection, this,
                                         std::placeholders::_1));

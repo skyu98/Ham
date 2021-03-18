@@ -93,7 +93,7 @@ namespace ham
         {
             loop_->assertInLoopThread();
             InetAddress peerAddr(sockets::getPeerAddr(fd));
-            std::string name(name_ + peerAddr.getIpPortStr() + "#" + std::to_string(nextConnId_++));
+            std::string name(name_ + ":" + peerAddr.getIpPortStr() + "#" + std::to_string(nextConnId_++));
             InetAddress localAddr(sockets::getLocalAddr(fd));
             
             TcpConnectionPtr conn = std::make_shared<TcpConnection>

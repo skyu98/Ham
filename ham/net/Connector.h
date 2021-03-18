@@ -48,8 +48,8 @@ private:
 
     /* data */
     enum State { kDisconnected, kConnecting, kConnected };
-    static const int kMaxRetryDelayMs = 30*1000;			// 30秒，最大重连延迟时间
-    static const int kInitRetryDelayMs = 500;				// 0.5秒，初始状态，连接不上，0.5秒后重连
+    static const int kMaxRetryDelayMs = 30 * 1000;         // 30秒，最大重连延迟时间	
+    static const int kInitRetryDelayMs = 5000;				// 0.5秒，初始状态，连接不上，0.5秒后重连	
 
     EventLoop* loop_;
     InetAddress serverAddr_;
@@ -61,6 +61,7 @@ private:
     TimerId retryTimerId_;
     bool validTimer_;
 };
+
 }
 }
 #endif // __CONNECTOR_H__

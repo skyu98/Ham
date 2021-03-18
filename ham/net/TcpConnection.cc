@@ -31,7 +31,7 @@ namespace ham
         
         TcpConnection::~TcpConnection() 
         {
-            DEBUG("TcpConnection::ctor[{}] at {} fd= {} ", name_, fmt::ptr(this), channel_->getFd());
+            DEBUG("TcpConnection::dtor[{}] at {} fd= {} ", name_, fmt::ptr(this), channel_->getFd());
         }
         
         void TcpConnection::establishConnection() 
