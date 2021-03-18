@@ -19,3 +19,6 @@ target_link_libraries(EventLoopThreadPool_unittest ham_net)
 add_executable(Buffer_unittest Buffer_unittest.cc)
 target_link_libraries(Buffer_unittest ham_net)
 add_test(NAME Buffer_unittest COMMAND Buffer_unittest)
+
+add_executable(TcpClient_unittest TcpClient_unittest.cc)
+target_link_libraries(TcpClient_unittest  ham_net)
