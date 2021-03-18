@@ -14,7 +14,7 @@ mkdir -p $BUILD_DIR/$BUILD_TYPE \
            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
            $SOURCE_DIR \
-  && make $*
+  && make -j4$*
 
 #cd $SOURCE_DIR && doxygen
 

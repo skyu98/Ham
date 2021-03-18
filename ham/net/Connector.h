@@ -2,11 +2,13 @@
 #define __CONNECTOR_H__
 
 #include "net/Channel.h"
+#include "net/TimerId.h"
 #include "net/InetAddress.h"
 #include <boost/noncopyable.hpp>
 #include <memory>
 #include <functional>
 #include <atomic>
+
 
 class EventLoop;
 namespace ham
@@ -27,7 +29,7 @@ public:
     void restart();
     void stop();
 
-    void setNewConnectionCallback(const newConnectionCallback& cb) { cb_ = cb; }
+    void setNewConnectionCallback(const newConnectionCallback& cb) { newConnCb_ = cb; }
 
     const InetAddress& serverAddr() const { return serverAddr_; }
 private:
@@ -53,7 +55,7 @@ private:
     InetAddress serverAddr_;
     std::atomic<State> state_;
     std::unique_ptr<Channel> connectChannel_;
-    newConnectionCallback cb_;
+    newConnectionCallback newConnCb_;
     std::atomic_bool connect_;
     int retryDelayMs_;		// 重连延迟时间（单位：毫秒）
     TimerId retryTimerId_;

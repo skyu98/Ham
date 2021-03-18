@@ -185,7 +185,7 @@ namespace ham
                     state_ = kConnected;
                     if(connect_)
                     {
-                        newConnectionCallback(socket_fd);
+                        newConnCb_(socket_fd);
                     }
                     else
                     {
@@ -216,6 +216,7 @@ namespace ham
             connectChannel_->remove();
             // Can't reset channel_ here, because we are inside Channel::handleEvent
             loop_->queueInLoop(std::bind(&Connector::resetChannel, this));
+            return fd;
         }
         
         void Connector::resetChannel() 

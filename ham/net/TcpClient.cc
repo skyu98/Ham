@@ -60,7 +60,8 @@ namespace ham
                 // conn处于未连接状态，将connetor_停止即可
                 connector_->stop();
                 // FIXME: HACK
-                loop_->runAfter(1, std::bind(&detail::removeConnector, connector_));
+                // bind不管函数形参是否为引用，都会进行复制；unique_ptr不能复制，所以使用ref()
+                loop_->runAfter(1, std::bind(&detail::removeConnector, std::ref(connector_)));
             }
         }
         

@@ -14,7 +14,7 @@ ChargenServer::ChargenServer(EventLoop* loop,
     server_.setConnectionCallback(
         std::bind(&ChargenServer::onConnection, this,
                 std::placeholders::_1));
-    server_.setWriteCompeleteCallback(
+    server_.setWriteCompleteCallback(
         std::bind(&ChargenServer::onWriteComplete, this,
                 std::placeholders::_1));
     server_.setMessageCallback(
