@@ -10,7 +10,7 @@ endif()
 
 # only build examples if this is the main project
 if(CMAKE_PROJECT_NAME STREQUAL "ham")
-  option(HAM_BUILD_EXAMPLES "Build Ham examples" ON)
+  option(HAM_BUILD_TESTS "Build Ham examples" ON)
 endif()
 
 set(CXX_FLAGS
@@ -23,6 +23,8 @@ set(CXX_FLAGS
   -Werror
   -Wconversion
   -Wno-unused-parameter
+  -Wno-unused-variable
+  -Wno-error=unused-result
   -Wold-style-cast
   -Woverloaded-virtual
   -Wpointer-arith
@@ -83,8 +85,12 @@ include_directories(${GTEST_INCLUDE_DIRS})
 link_directories(/usr/local/lib)
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
-message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_TYPE}})
+message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${BUILD_TYPE})
 
 add_subdirectory(ham/base)
 add_subdirectory(ham/net)
 add_subdirectory(examples)
+
+if(BUILD_TYPE STREQUAL "RELEASE")
+    add_subdirectory(benchmarks)
+endif()

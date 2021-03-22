@@ -37,7 +37,7 @@ public:
     int8_t peekInt8() const;
     int16_t peekInt16() const;
     int32_t peekInt32() const;
-    int32_t peekInt64() const;
+    int64_t peekInt64() const;
 
     int8_t readInt8();
     int16_t readInt16();

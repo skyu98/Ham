@@ -152,7 +152,7 @@ namespace ham
             }
             {
                 auto res = timerList_.insert(timeEntry(when, timer));
-                assert(res.second);
+                assert(res.second);(void)res;
             }
         }
         

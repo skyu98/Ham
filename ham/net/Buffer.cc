@@ -76,17 +76,17 @@ namespace ham
         int32_t Buffer::peekInt32() const
         {
             assert(readableBytes() >= sizeof(int32_t));
-            int16_t be32 = 0;
+            int32_t be32 = 0;
             ::memcpy(&be32, peek(), sizeof(int32_t));
-            return sockets::networkToHost16(be32);
+            return sockets::networkToHost32(be32);
         }
         
-        int32_t Buffer::peekInt64() const
+        int64_t Buffer::peekInt64() const
         {
             assert(readableBytes() >= sizeof(int64_t));
-            int16_t be64 = 0;
+            int64_t be64 = 0;
             ::memcpy(&be64, peek(), sizeof(int64_t));
-            return sockets::networkToHost16(be64);
+            return sockets::networkToHost64(be64);
         }
 
         void Buffer::appendInt64(int64_t x)

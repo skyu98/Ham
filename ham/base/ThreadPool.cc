@@ -59,7 +59,7 @@ namespace ham
                 notFull_.wait(lock);
             }
             queue_.emplace_back(newTask);
-            std::cout << "size is " << queue_.size() << std::endl;
+            // std::cout << "size is " << queue_.size() << std::endl;
             notEmpty_.notify_one();
         }
     }
